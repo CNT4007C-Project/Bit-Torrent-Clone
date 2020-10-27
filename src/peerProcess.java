@@ -1,14 +1,17 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.BitSet;
+import java.util.HashMap;
 
 // this process should take in the peerID as an argument and run the peer process
 
-// TODO file reading functions for Common.cfg and PeerInfo.cfg
-// TODO bitfield storage
+// TODO figure out if subdirectories should be created at runtime or manually beforehand
 
 class peerProcess {
+    private static int peerId;
 
+    // Common.cfg variables
     private static int numberOfPreferredNeighbors;
     private static int unchokingInterval;
     private static int optimisticUnchokingInterval;
@@ -16,9 +19,13 @@ class peerProcess {
     private static int fileSize;
     private static int pieceSize;
 
+    // PeerInfo.cfg variables
+    private static HashMap<Integer, Peer> peerDictionary = new HashMap<>();
+
+    private static BitSet bitField;
+
     public static void main(String[] args) {
-        int peerId = Integer.parseInt(args[0]);
-        System.out.println(peerId);
+        peerId = Integer.parseInt(args[0]);
         initialize();
     }
 
@@ -61,11 +68,37 @@ class peerProcess {
 
             /* Read PeerInfo.cfg */
             peerInfoBufferedReader = new BufferedReader(new FileReader("./PeerInfo.cfg"));
+            String[] strings = null;
+
+            currentLine = peerInfoBufferedReader.readLine();
+            while (currentLine != null) {
+                strings = currentLine.split(" ");
+                Peer peer = new Peer(Integer.parseInt(strings[0]), strings[1], Integer.parseInt(strings[2]),
+                        Integer.parseInt(strings[3]));
+                peerDictionary.put(Integer.parseInt(strings[0]), peer);
+                currentLine = peerInfoBufferedReader.readLine();
+            }
+
+            int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
+            bitField = new BitSet(pieces);
+
+            // set bit field to all ones if this peer has the file
+            if (peerDictionary.get(peerId).getHasFile()) {
+                bitField.set(0, pieces);
+            }
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
             // close reader
+            try {
+                if (commonBufferedReader != null)
+                    commonBufferedReader.close();
+                if (peerInfoBufferedReader != null)
+                    peerInfoBufferedReader.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
         }
     }
 
