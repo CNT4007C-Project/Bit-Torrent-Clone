@@ -1,0 +1,5 @@
+To compile:
+javac src/*.java -d bin/
+
+To run:
+java -classpath "./bin" peerProcess [peerID]

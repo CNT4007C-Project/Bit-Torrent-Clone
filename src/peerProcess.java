@@ -33,6 +33,18 @@ class peerProcess {
         initialize();
     }
 
+    public static int getPeerId(){
+        return peerId;
+    }
+
+    public static int getPieceSize(){
+        return pieceSize;
+    }
+
+    public static HashMap<Integer, Peer> getPeerDictionary(){
+        return peerDictionary;
+    }
+
     /* used ot read both .cfg files */
     private static void initialize() {
 
@@ -81,6 +93,7 @@ class peerProcess {
                         Integer.parseInt(strings[3]));
                 peerDictionary.put(Integer.parseInt(strings[0]), peer);
                 currentLine = peerInfoBufferedReader.readLine();
+                
             }
 
             int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
@@ -90,6 +103,8 @@ class peerProcess {
             if (peerDictionary.get(peerId).getHasFile()) {
                 bitField.set(0, pieces);
             }
+
+            
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
