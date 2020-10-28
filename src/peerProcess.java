@@ -7,9 +7,12 @@ import java.util.HashMap;
 // this process should take in the peerID as an argument and run the peer process
 
 // TODO figure out if subdirectories should be created at runtime or manually beforehand
+// FAQ says rthey can be created manually beforehand
+
+// TODO one socket for every neighboring peer, two threads per socket (sending and receiving)
 
 class peerProcess {
-    private static int peerId;
+    private static int peerId; // peer ID for THIS peer
 
     // Common.cfg variables
     private static int numberOfPreferredNeighbors;
@@ -20,7 +23,8 @@ class peerProcess {
     private static int pieceSize;
 
     // PeerInfo.cfg variables
-    private static HashMap<Integer, Peer> peerDictionary = new HashMap<>();
+    private static HashMap<Integer, Peer> peerDictionary = new HashMap<>(); // includes info of every peer including
+                                                                            // THIS one
 
     private static BitSet bitField;
 
