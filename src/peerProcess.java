@@ -33,15 +33,15 @@ class peerProcess {
         initialize();
     }
 
-    public static int getPeerId(){
+    public static int getPeerId() {
         return peerId;
     }
 
-    public static int getPieceSize(){
+    public static int getPieceSize() {
         return pieceSize;
     }
 
-    public static HashMap<Integer, Peer> getPeerDictionary(){
+    public static HashMap<Integer, Peer> getPeerDictionary() {
         return peerDictionary;
     }
 
@@ -54,7 +54,7 @@ class peerProcess {
         try {
 
             /* Read Common.cfg */
-            commonBufferedReader = new BufferedReader(new FileReader("./Common.cfg"));
+            commonBufferedReader = new BufferedReader(new FileReader("../Common.cfg"));
 
             // TODO this could probably be a loop that automatically names the variables in
             // a HashMap;\
@@ -83,7 +83,7 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("./PeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("../PeerInfo.cfg"));
             String[] strings = null;
 
             currentLine = peerInfoBufferedReader.readLine();
@@ -93,7 +93,7 @@ class peerProcess {
                         Integer.parseInt(strings[3]));
                 peerDictionary.put(Integer.parseInt(strings[0]), peer);
                 currentLine = peerInfoBufferedReader.readLine();
-                
+
             }
 
             int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
@@ -103,8 +103,6 @@ class peerProcess {
             if (peerDictionary.get(peerId).getHasFile()) {
                 bitField.set(0, pieces);
             }
-
-            
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
