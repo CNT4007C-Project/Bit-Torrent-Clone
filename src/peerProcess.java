@@ -11,6 +11,8 @@ import java.util.HashMap;
 
 // TODO one socket for every neighboring peer, two threads per socket (sending and receiving)
 
+// can we assum epeer IDs will be in the correct order?
+
 class peerProcess {
     private static int peerId; // peer ID for THIS peer
 
@@ -31,6 +33,7 @@ class peerProcess {
     public static void main(String[] args) {
         peerId = Integer.parseInt(args[0]);
         initialize();
+        requestConnections();
     }
 
     public static int getPeerId() {
@@ -119,4 +122,11 @@ class peerProcess {
         }
     }
 
+    public static void requestConnections() {
+
+    }
+
+    public static void acceptConnections() {
+
+    }
 }
