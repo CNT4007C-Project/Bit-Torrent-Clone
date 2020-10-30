@@ -92,6 +92,7 @@ class peerProcess {
              * TODO "Local" version is just for testing locally, should be changed for
              * submission
              */
+
             String[] strings = null;
 
             currentLine = peerInfoBufferedReader.readLine();
