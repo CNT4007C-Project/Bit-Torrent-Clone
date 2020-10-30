@@ -87,7 +87,11 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("../PeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("../LocalPeerInfo.cfg"));
+            /*
+             * TODO "Local" version is just for testing locally, should be changed for
+             * submission
+             */
             String[] strings = null;
 
             currentLine = peerInfoBufferedReader.readLine();
@@ -123,13 +127,20 @@ class peerProcess {
         }
     }
 
+    // reaches out to all peers that came before it to initiate connections
     public static void requestConnections() {
         for (int i = 1001; i < peerId; i++) {
-
+            connectionManager.put(i, new PeerConnection(i));
         }
+
+        connectionManager.forEach((id, peer) -> {
+            peer.connect();
+        });
     }
 
     public static void acceptConnections() {
-
+        // TODO this would be what Mustafa is doing (listening for peers that come after
+        // and accepting their connectiongs in new sockets that gert added to the
+        // connectionManager map)
     }
 }

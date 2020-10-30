@@ -6,10 +6,11 @@ import java.util.*;
 
 public class Server {
 
-	private static final int sPort = 8000;   //The server will be listening on this port number
+	private static int sPort;   //The server will be listening on this port number
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("The server is running."); 
+		sPort = Integer.parseInt(args[0]);
+		System.out.println("The server is running.");
         	ServerSocket listener = new ServerSocket(sPort);
 		int clientNum = 1;
         	try {
@@ -20,8 +21,8 @@ public class Server {
             			}
         	} finally {
             		listener.close();
-        	} 
- 
+        	}
+
     	}
 
 	/**
