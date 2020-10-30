@@ -29,6 +29,7 @@ class peerProcess {
                                                                             // THIS one
 
     private static BitSet bitField;
+    private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
 
     public static void main(String[] args) {
         peerId = Integer.parseInt(args[0]);
@@ -123,7 +124,9 @@ class peerProcess {
     }
 
     public static void requestConnections() {
+        for (int i = 1001; i < peerId; i++) {
 
+        }
     }
 
     public static void acceptConnections() {
