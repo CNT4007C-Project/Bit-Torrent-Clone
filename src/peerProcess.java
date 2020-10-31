@@ -22,6 +22,8 @@ class peerProcess {
     private static int fileSize;
     private static int pieceSize;
 
+    private static int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
+
     // PeerInfo.cfg variables
     private static HashMap<Integer, Peer> peerDictionary = new HashMap<>(); // includes info of every peer including
                                                                             // THIS one
@@ -47,6 +49,10 @@ class peerProcess {
 
     public static String getFileName(){
         return fileName;
+    }
+
+    public static int getNumPieces(){
+        return pieces;
     }
 
     public static HashMap<Integer, Peer> getPeerDictionary(){
@@ -104,7 +110,7 @@ class peerProcess {
                 
             }
 
-            int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
+            
             bitField = new BitSet(pieces);
 
             // set bit field to all ones if this peer has the file
@@ -112,6 +118,7 @@ class peerProcess {
                 bitField.set(0, pieces);
             }
 
+            ConnectionProcess.startConnection();
             
 
         } catch (IOException ioe) {
