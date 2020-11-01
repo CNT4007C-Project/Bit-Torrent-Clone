@@ -22,8 +22,6 @@ class peerProcess {
     private static int fileSize;
     private static int pieceSize;
 
-    private static int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
-
     // PeerInfo.cfg variables
     private static HashMap<Integer, Peer> peerDictionary = new HashMap<>(); // includes info of every peer including
                                                                             // THIS one
@@ -52,7 +50,7 @@ class peerProcess {
     }
 
     public static int getNumPieces(){
-        return pieces;
+        return (int) Math.ceil(fileSize / (double) pieceSize);
     }
 
     public static HashMap<Integer, Peer> getPeerDictionary(){
@@ -110,6 +108,7 @@ class peerProcess {
                 
             }
 
+            int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
             
             bitField = new BitSet(pieces);
 
