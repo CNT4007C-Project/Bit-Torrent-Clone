@@ -34,6 +34,7 @@ class peerProcess {
     public static void main(String[] args) {
         peerId = Integer.parseInt(args[0]);
         initialize();
+        acceptConnections();
         requestConnections();
     }
 
@@ -58,7 +59,7 @@ class peerProcess {
         try {
 
             /* Read Common.cfg */
-            commonBufferedReader = new BufferedReader(new FileReader("../Common.cfg"));
+            commonBufferedReader = new BufferedReader(new FileReader("Common.cfg"));
 
             // TODO this could probably be a loop that automatically names the variables in
             // a HashMap;\
@@ -87,7 +88,7 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("../LocalPeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("LocalPeerInfo.cfg"));
             /*
              * TODO "Local" version is just for testing locally, should be changed for
              * submission
@@ -140,8 +141,7 @@ class peerProcess {
     }
 
     public static void acceptConnections() {
-        // TODO this would be what Mustafa is doing (listening for peers that come after
-        // and accepting their connectiongs in new sockets that gert added to the
-        // connectionManager map)
+        PeerConnection accept = new PeerConnection(peerId);
+        accept.accept();
     }
 }

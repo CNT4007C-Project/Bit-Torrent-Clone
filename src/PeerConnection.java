@@ -1,8 +1,11 @@
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.net.ServerSocket;
+import java.util.HashMap;
+import java.util.Map; 
 
-public class PeerConnection {
+public class PeerConnection extends Thread {
 
     private Socket connectionSocket;
     private int connectedPeerId;
@@ -26,6 +29,23 @@ public class PeerConnection {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+    }
+
+    public void accept(){
+        ServerSocket servsock = null;
+        Socket sock = null;
+        Peer self = peerProcess.getPeerDictionary().get(peerProcess.getPeerId()); 
+        //
+        while(true){
+            try {
+                servsock = new ServerSocket(self.getPortNumber());
+                sock = servsock.accept();
+
+            } catch (Exception e) {
+                //TODO: handle exception
+            }
+            
         }
     }
 

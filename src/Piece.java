@@ -1,5 +1,3 @@
-
-
 public class Piece {
 
     private int pieceSize = peerProcess.getPieceSize();
