@@ -33,8 +33,11 @@ class peerProcess {
 
     public static void main(String[] args) {
         peerId = Integer.parseInt(args[0]);
+        System.out.println("Initializing");
         initialize();
+        System.out.println("Starting Receiving Connections");
         acceptConnections();
+        System.out.println("Starting Sending Conenctions");
         requestConnections();
     }
 
@@ -136,12 +139,14 @@ class peerProcess {
         }
 
         connectionManager.forEach((id, peer) -> {
-            peer.connect();
+            Thread s = new Thread(() -> peer.run());
+            s.start();
         });
     }
 
     public static void acceptConnections() {
-        PeerConnection accept = new PeerConnection(peerId);
-        accept.accept();
+        PeerListener accept = new PeerListener(peerId);
+        Thread t = new Thread(() -> accept.run());
+        t.start();
     }
 }

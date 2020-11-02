@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map; 
 
-public class PeerConnection extends Thread {
+public class PeerConnection implements Runnable{
 
     private Socket connectionSocket;
     private int connectedPeerId;
@@ -16,7 +16,8 @@ public class PeerConnection extends Thread {
         connectedPeer = peerProcess.getPeerDictionary().get(id);
     }
 
-    public void connect() {
+    @Override
+    public void run() {
         try {
 
             connectionSocket = new Socket(connectedPeer.getHostName(), connectedPeer.getPortNumber());
@@ -31,22 +32,5 @@ public class PeerConnection extends Thread {
             e.printStackTrace();
         }
     }
-
-    public void accept(){
-        ServerSocket servsock = null;
-        Socket sock = null;
-        Peer self = peerProcess.getPeerDictionary().get(peerProcess.getPeerId()); 
-        //
-        while(true){
-            try {
-                servsock = new ServerSocket(self.getPortNumber());
-                sock = servsock.accept();
-
-            } catch (Exception e) {
-                //TODO: handle exception
-            }
-            
-        }
-    }
-
+    
 }
