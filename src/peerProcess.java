@@ -33,7 +33,14 @@ class peerProcess {
 
     public static void main(String[] args) {
         peerId = Integer.parseInt(args[0]);
+        System.out.println("Initializing");
         initialize();
+<<<<<<< HEAD
+=======
+        System.out.println("Starting Receiving Connections");
+        acceptConnections();
+        System.out.println("Starting Sending Conenctions");
+>>>>>>> aaad1d21d36ef82d21f005abaacbef64eedee14f
         requestConnections();
     }
 
@@ -141,13 +148,20 @@ class peerProcess {
         }
 
         connectionManager.forEach((id, peer) -> {
-            peer.connect();
+            Thread s = new Thread(() -> peer.run());
+            s.start();
         });
     }
 
     public static void acceptConnections() {
+<<<<<<< HEAD
         // TODO this would be what Mustafa is doing (listening for peers that come after
         // and accepting their connectiongs in new sockets that gert added to the
         // connectionManager map)
+=======
+        PeerListener accept = new PeerListener(peerId);
+        Thread t = new Thread(() -> accept.run());
+        t.start();
+>>>>>>> aaad1d21d36ef82d21f005abaacbef64eedee14f
     }
 }
