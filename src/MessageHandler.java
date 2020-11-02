@@ -14,6 +14,7 @@ public class MessageHandler {
             // handshake message
             byte[] rawId = Arrays.copyOfRange(message, 28, 32);
             int peerId = java.nio.ByteBuffer.wrap(rawId).getInt();
+            // TODO check if peerId is expected
 
         } else {
 
@@ -35,6 +36,11 @@ public class MessageHandler {
                 case 4: // have
                     break;
                 case 5: // bitfield
+
+                    // compare peer bitfield to this bitfield
+                    // BitSet bitfield =
+                    // peerProcess.getPeerDictionary().get(peerProcess.getPeerId());
+
                     break;
                 case 6: // request
                     break;

@@ -28,7 +28,7 @@ class peerProcess {
     private static HashMap<Integer, Peer> peerDictionary = new HashMap<>(); // includes info of every peer including
                                                                             // THIS one
 
-    private static BitSet bitField;
+    private static byte[] bitField;
     private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
 
     public static void main(String[] args) {
@@ -106,11 +106,17 @@ class peerProcess {
             }
 
             int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
-            bitField = new BitSet(pieces);
+            bitField = new byte[(int) Math.ceil((double) pieces / 8.0)];
+
+            for (byte b : bitField) {
+                System.out.println(Integer.toBinaryString(b & 255 | 256).substring(1));
+            }
 
             // set bit field to all ones if this peer has the file
             if (peerDictionary.get(peerId).getHasFile()) {
-                bitField.set(0, pieces);
+                for (int i = 0; i < pieces; i++) {
+
+                }
             }
 
         } catch (IOException ioe) {
