@@ -32,4 +32,15 @@ public class BitfieldUtility {
         }
         System.out.println("");
     }
+
+    public static boolean hasNeededPiece(byte[] ourBitfield, byte[] peerBitfield) {
+        // tells us if the peerBitfield has a piece our bitfield does not
+        for (int i = 0; i < peerBitfield.length * 8; i++) {
+            if (!getBit(ourBitfield, i) && getBit(peerBitfield, i)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
