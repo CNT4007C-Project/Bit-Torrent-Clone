@@ -34,7 +34,6 @@ class peerProcess {
     public static void main(String[] args) {
         peerId = Integer.parseInt(args[0]);
         initialize();
-        acceptConnections();
         requestConnections();
     }
 
@@ -59,7 +58,7 @@ class peerProcess {
         try {
 
             /* Read Common.cfg */
-            commonBufferedReader = new BufferedReader(new FileReader("Common.cfg"));
+            commonBufferedReader = new BufferedReader(new FileReader("../Common.cfg"));
 
             // TODO this could probably be a loop that automatically names the variables in
             // a HashMap;\
@@ -88,7 +87,7 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("LocalPeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("../LocalPeerInfo.cfg"));
             /*
              * TODO "Local" version is just for testing locally, should be changed for
              * submission
@@ -109,16 +108,16 @@ class peerProcess {
             int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
             bitField = new byte[(int) Math.ceil((double) pieces / 8.0)];
 
-            for (byte b : bitField) {
-                System.out.println(Integer.toBinaryString(b & 255 | 256).substring(1));
-            }
+            // BitfieldUtility.printBitfield(bitField);
 
             // set bit field to all ones if this peer has the file
             if (peerDictionary.get(peerId).getHasFile()) {
                 for (int i = 0; i < pieces; i++) {
-
+                    BitfieldUtility.setBit(bitField, i, true);
                 }
             }
+
+            // BitfieldUtility.printBitfield(bitField);
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -147,7 +146,8 @@ class peerProcess {
     }
 
     public static void acceptConnections() {
-        PeerConnection accept = new PeerConnection(peerId);
-        accept.accept();
+        // TODO this would be what Mustafa is doing (listening for peers that come after
+        // and accepting their connectiongs in new sockets that gert added to the
+        // connectionManager map)
     }
 }
