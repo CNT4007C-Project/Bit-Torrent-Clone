@@ -5,7 +5,8 @@ import java.util.Arrays;
 
 public class MessageHandler {
 
-    public static void readMessage(byte[] message) {
+    public static void readMessage(byte[] message, int srcId) { // srcId represent the peer id of the source of the
+                                                                // message.
 
         String header = new String(Arrays.copyOfRange(message, 0, 18), StandardCharsets.UTF_8);
 
@@ -38,8 +39,18 @@ public class MessageHandler {
                 case 5: // bitfield
 
                     // compare peer bitfield to this bitfield
-                    // BitSet bitfield =
-                    // peerProcess.getPeerDictionary().get(peerProcess.getPeerId());
+                    byte[] bitfield = peerProcess.getBitfield();
+                    byte[] peerBitfield = Arrays.copyOfRange(message, 5, 5 + bitfield.length + 1); // I think this
+                                                                                                   // works?
+
+                    if (BitfieldUtility.hasNeededPiece(bitfield, peerBitfield)) {
+                        // TODO send "interested" message
+                    } else {
+                        // TODO send "not interested" message
+                    }
+
+                    // updates peer bitfield with the recent one from the message
+                    peerProcess.getPeerDictionary().get(srcId).setBitfield(peerBitfield);
 
                     break;
                 case 6: // request

@@ -57,6 +57,10 @@ class peerProcess {
         return bitField;
     }
 
+    public static int getPieces() {
+        return (int) Math.ceil(fileSize / (double) pieceSize);
+    }
+
     /* used ot read both .cfg files */
     private static void initialize() {
 
