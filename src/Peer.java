@@ -1,3 +1,5 @@
+package src;
+
 // stores data for each peer learned from PeerInfo.cfg
 
 public class Peer {
