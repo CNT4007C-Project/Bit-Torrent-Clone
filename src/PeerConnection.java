@@ -3,17 +3,24 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.net.ServerSocket;
 import java.util.HashMap;
-import java.util.Map; 
+import java.util.Map;
 
-public class PeerConnection implements Runnable{
+public class PeerConnection implements Runnable {
 
     private Socket connectionSocket;
     private int connectedPeerId;
     private Peer connectedPeer;
 
-    public PeerConnection(int id) {
+    public PeerConnection(int id, Socket s) { // for requested connections where destination is known
         connectedPeerId = id;
         connectedPeer = peerProcess.getPeerDictionary().get(id);
+        connectionSocket = s;
+    }
+
+    public PeerConnection(Socket s) { // for listened connections when peer ID is unknown
+        connectedPeerId = 0;
+        connectedPeer = null;
+        connectionSocket = s;
     }
 
     @Override
@@ -32,5 +39,5 @@ public class PeerConnection implements Runnable{
             e.printStackTrace();
         }
     }
-    
+
 }

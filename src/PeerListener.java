@@ -11,22 +11,23 @@ public class PeerListener implements Runnable {
         connectedPeer = peerProcess.getPeerDictionary().get(id);
     }
 
-    //@Override
-    public void run(){
+    // @Override
+    public void run() {
         ServerSocket servsock = null;
         Socket sock = null;
-        Peer self = peerProcess.getPeerDictionary().get(peerProcess.getPeerId()); 
+        Peer self = peerProcess.getPeerDictionary().get(peerProcess.getPeerId());
         //
-        while(true){
+        while (true) {
             try {
                 servsock = new ServerSocket(self.getPortNumber());
-                sock = servsock.accept();
+                sock = servsock.accept(); // whenever this happens it should create a new PeerConnection object and add
+                                          // it to the connectionManager
                 System.out.println("Peer has connected! : " + sock);
 
             } catch (Exception e) {
-                //TODO: handle exception
+                // TODO: handle exception
             }
-            
+
         }
     }
 }

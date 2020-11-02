@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.BitSet;
 import java.util.HashMap;
 
@@ -148,8 +150,24 @@ class peerProcess {
 
     // reaches out to all peers that came before it to initiate connections
     public static void requestConnections() {
+
+        Socket toExisting = null;
         for (int i = 1001; i < peerId; i++) {
-            connectionManager.put(i, new PeerConnection(i));
+            Peer existingPeer = peerDictionary.get(i);
+            try {
+
+                toExisting = new Socket(existingPeer.getHostName(), existingPeer.getPortNumber());
+
+                System.err.println("Connected to peer " + i + " at port " + existingPeer.getPortNumber() + "!");
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                System.err.println("The host listed for peer " + i + " is not recognized");
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            connectionManager.put(i, new PeerConnection(i, toExisting));
         }
 
         connectionManager.forEach((id, peer) -> {
