@@ -2,22 +2,21 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class File {
+public class FileMgr {
 
     private ArrayList<Piece> chunks = new ArrayList<Piece>();
-    private int 
 
-    public File(){
+    public FileMgr(){
 
         HashMap<Integer, Peer> peerDictionary = peerProcess.getPeerDictionary();
         if(peerDictionary.get(peerProcess.getPeerId()).getHasFile() == true){
-            chunks = fileToPieces();
+            //chunks = fileToPieces();
         }
     }
 
-    private ArrayList<Piece> fileToPieces(){
-        FileInputStream fileReader;
-        byte[] pieceBytes = new byte[];
-    }
+    // private ArrayList<Piece> fileToPieces(){
+    //     FileInputStream fileReader;
+    //     byte[] pieceBytes = new byte[0];
+    // }
     
 }
