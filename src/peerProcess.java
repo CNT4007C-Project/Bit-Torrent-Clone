@@ -51,11 +51,11 @@ class peerProcess {
         return pieceSize;
     }
 
-    public static int getFileSize(){
+    public static int getFileSize() {
         return fileSize;
     }
 
-    public static String getFileName(){
+    public static String getFileName() {
         return fileName;
     }
 
@@ -80,7 +80,7 @@ class peerProcess {
         try {
 
             /* Read Common.cfg */
-            commonBufferedReader = new BufferedReader(new FileReader("../Common.cfg"));
+            commonBufferedReader = new BufferedReader(new FileReader("./Common.cfg"));
 
             // TODO this could probably be a loop that automatically names the variables in
             // a HashMap;\
@@ -109,7 +109,7 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("../LocalPeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("./PeerInfo.cfg"));
             /*
              * TODO "Local" version is just for testing locally, should be changed for
              * submission
