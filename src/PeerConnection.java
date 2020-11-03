@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.InflaterOutputStream;
 
 public class PeerConnection implements Runnable {
 
@@ -170,8 +171,53 @@ public class PeerConnection implements Runnable {
     public void listenForMessages() {
 
         while (true) { // once again, this should probably be a thread
+            processMessage();
+        }
 
-            // byte[] incomingMessage = inputStream.
+    }
+
+    public synchronized void processMessage() { // TODO confirm what "synchronized does"
+
+        byte[] messageLength = new byte[4];
+        byte[] messageType = new byte[1];
+
+        try {
+            inputStream.read(messageLength); // TODO confirm if length of bytes needs to be specified
+            inputStream.read(messageType);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        int type = messageType[0];
+
+        switch (type) {
+            case 0: // choke
+                break;
+            case 1: // unchoke
+                break;
+            case 2: // interested
+                break;
+            case 3: // not interested
+                break;
+            case 4: // have
+                byte[] pieceIndex = new byte[4];
+                try {
+                    inputStream.read(pieceIndex);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            default:
+                System.err.println("Message type error!");
 
         }
 
