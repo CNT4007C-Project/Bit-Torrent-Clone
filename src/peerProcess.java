@@ -51,6 +51,14 @@ class peerProcess {
         return pieceSize;
     }
 
+    public static int getFileSize(){
+        return fileSize;
+    }
+
+    public static String getFileName(){
+        return fileName;
+    }
+
     public static HashMap<Integer, Peer> getPeerDictionary() {
         return peerDictionary;
     }
