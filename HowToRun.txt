@@ -1,4 +1,5 @@
 To compile:
+java -cp ./bin/jsch-0.1.54.jar StartRemotePeers
 javac src/*.java -d bin/
 
 To run:

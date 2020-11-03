@@ -1,3 +1,6 @@
+// javac -cp '.:jsch-0.1.54.jar' StartRemotePeers.java
+// java -cp '.:jsch-0.1.54.jar' StartRemotePeers
+
 //package src;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,12 +64,12 @@ public class StartRemotePeers {
         */
 
         /*
-        1001 lin114-00.cise.ufl.edu 6008 1
-        1002 lin114-01.cise.ufl.edu 6008 0
-        1003 lin114-02.cise.ufl.edu 6008 0
-        1004 lin114-03.cise.ufl.edu 6008 0
-        1005 lin114-04.cise.ufl.edu 6008 0
-        1006 lin114-05.cise.ufl.edu 6008 0
+        1001 lin114-00.cise.ufl.edu 4861 1
+        1002 lin114-01.cise.ufl.edu 4861 0
+        1003 lin114-02.cise.ufl.edu 4861 0
+        1004 lin114-03.cise.ufl.edu 4861 0
+        1005 lin114-04.cise.ufl.edu 4861 0
+        1006 lin114-05.cise.ufl.edu 4861 0
         1007 localhost 6008 0
         */
 
@@ -76,7 +79,6 @@ public class StartRemotePeers {
         peerList.add(new PeerInfo("1004", "lin114-03.cise.ufl.edu"));
         peerList.add(new PeerInfo("1005", "lin114-04.cise.ufl.edu"));
         peerList.add(new PeerInfo("1006", "lin114-05.cise.ufl.edu"));
-        peerList.add(new PeerInfo("1007", "localhost"));
 
         for (PeerInfo remotePeer : peerList) {
             try {
@@ -87,10 +89,10 @@ public class StartRemotePeers {
                 * without a password. Or you can use the corressponding method
                 * of JSch which accepts a password.
                 */
-                jsch.addIdentity("./../.ssh/id_rsa", "");
-                Session session = jsch.getSession(ciseUser, remotePeer.getHostName(), 22);
+                jsch.addIdentity("id_rsa", "networks");
+                Session session = jsch.getSession(ciseUser, remotePeer.getHostName(), 4861);
                 Properties config = new Properties();
-                config.put("StrictHostKeyChecking", "no");
+                config.setProperty("StrictHostKeyChecking", "no");
                 session.setConfig(config);
 
                 session.connect();

@@ -5,19 +5,21 @@ import java.util.HashMap;
 public class File {
 
     private ArrayList<Piece> chunks = new ArrayList<Piece>();
-    private int 
+    //private int 
 
     public File(){
 
         HashMap<Integer, Peer> peerDictionary = peerProcess.getPeerDictionary();
         if(peerDictionary.get(peerProcess.getPeerId()).getHasFile() == true){
             chunks = fileToPieces();
+            chunks = null;
         }
     }
 
+    
     private ArrayList<Piece> fileToPieces(){
         FileInputStream fileReader;
-        byte[] pieceBytes = new byte[];
+        return new ArrayList<>();
     }
     
 }
