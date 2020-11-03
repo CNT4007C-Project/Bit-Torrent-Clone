@@ -120,8 +120,10 @@ class peerProcess {
             }
 
             int pieces = (int) Math.ceil(fileSize / (double) pieceSize);
+            // System.out.println(pieces);
             bitField = new byte[(int) Math.ceil((double) pieces / 8.0)];
 
+            // System.out.println((int) Math.ceil((double) pieces / 8.0));
             // BitfieldUtility.printBitfield(bitField);
 
             // set bit field to all ones if this peer has the file

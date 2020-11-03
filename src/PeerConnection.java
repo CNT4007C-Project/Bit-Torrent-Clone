@@ -58,11 +58,19 @@ public class PeerConnection implements Runnable {
             e.printStackTrace();
         }
 
+        // System.out.println(peerProcess.getBitfield().length + " " +
+        // peerProcess.getPieces());
         sendHandshake();
+        receiveHandshake();
+        if (handshakeReceived) {
+            // start regular message process
+            sendBitfieldMessage();
+            listenForMessages(); // TODO this needs to be a thread
+        }
 
     }
 
-    public void sendHandshake() {
+    public synchronized void sendHandshake() {
         String handshakeHeader = "P2PFILESHARINGPROJ";
         byte[] handshakeMessage = new byte[32];
 
@@ -126,6 +134,45 @@ public class PeerConnection implements Runnable {
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+
+    }
+
+    public synchronized void sendBitfieldMessage() {
+
+        int bitfieldLength = peerProcess.getBitfield().length;
+        byte[] message = new byte[4 + 1 + bitfieldLength];
+
+        byte[] messageLength = new byte[4];
+        messageLength[0] = (byte) (bitfieldLength >>> 24);
+        messageLength[1] = (byte) (bitfieldLength >>> 16);
+        messageLength[2] = (byte) (bitfieldLength >>> 8);
+        messageLength[3] = (byte) (bitfieldLength >>> 0);
+
+        System.arraycopy(messageLength, 0, message, 0, 4);
+
+        byte[] messageType = { (byte) 5 };
+
+        System.arraycopy(messageType, 0, message, 4, 1);
+
+        System.arraycopy(peerProcess.getBitfield(), 0, message, 5, bitfieldLength);
+
+        try {
+            outputStream.write(message);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public void listenForMessages() {
+
+        while (true) { // once again, this should probably be a thread
+
+            // byte[] incomingMessage = inputStream.
+
         }
 
     }
