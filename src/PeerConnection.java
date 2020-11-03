@@ -18,6 +18,7 @@ public class PeerConnection implements Runnable {
     private Peer connectedPeer;
     BufferedInputStream inputStream;
     BufferedOutputStream outputStream;
+    private boolean handshakeReceived = false;
 
     public PeerConnection(int id, Socket s) { // for requested connections where destination is known
         connectedPeerId = id;
@@ -90,6 +91,39 @@ public class PeerConnection implements Runnable {
             outputStream.write(handshakeMessage);
             outputStream.flush();
         } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public void receiveHandshake() {
+        byte[] incomingHandshake = new byte[32];
+        try {
+            inputStream.read(incomingHandshake);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        String handshakeHeader;
+        try {
+            handshakeHeader = new String((Arrays.copyOfRange(incomingHandshake, 0, 18)), "UTF_8");
+
+            if (handshakeHeader.equals("P2PFILESHARINGPROJ")) {
+                // TODO some logic to see if peerID is the "expected" peer as per the spec
+                byte[] id = (Arrays.copyOfRange(incomingHandshake, 28, 32));
+                int temp = (int) (id[0] << 24);
+                temp += (int) (id[1] << 16);
+                temp += (int) (id[2] << 8);
+                temp += (int) (id[3] << 0);
+
+                connectedPeerId = temp;
+                connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
+                handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
+                                          // automatically?
+            }
+        } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
