@@ -39,7 +39,7 @@ class peerProcess {
         initialize();
         System.out.println("Starting Receiving Connections");
         acceptConnections();
-        System.out.println("Starting Sending Conenctions");
+        System.out.println("Starting Sending Connections");
         requestConnections();
     }
 
