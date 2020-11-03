@@ -150,7 +150,6 @@ class peerProcess {
 
     // reaches out to all peers that came before it to initiate connections
     public static void requestConnections() {
-
         Socket toExisting = null;
         for (int i = 1001; i < peerId; i++) {
             Peer existingPeer = peerDictionary.get(i);
