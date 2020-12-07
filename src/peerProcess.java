@@ -34,6 +34,7 @@ class peerProcess {
     private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
 
     public static void main(String[] args) {
+        //Do not log before running the next line
         peerId = Integer.parseInt(args[0]);
         System.out.println("Initializing");
         initialize();

@@ -1,0 +1,10 @@
+To compile:
+javac *.java
+cd RemotePeers;javac -cp '.:jsch-0.1.54.jar' StartRemotePeers.java
+
+To run:
+java -cp '.:jsch-0.1.54.jar' StartRemotePeers
+
+then open a new terminal instance, head back to the working directory and run
+
+java peerProcess [peerID]

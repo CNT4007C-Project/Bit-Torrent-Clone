@@ -1,5 +1,7 @@
 To compile:
 javac src/*.java -d bin/
+cd startpeers-from-students;javac -cp '.:jsch-0.1.54.jar' StartRemotePeers.java
 
 To run:
-java -classpath "./bin" peerProcess [peerID]
+java -cp '.:jsch-0.1.54.jar' StartRemotePeers
+cd ..;java -classpath "./bin" peerProcess [peerID]
