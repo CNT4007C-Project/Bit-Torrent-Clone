@@ -86,6 +86,7 @@ class peerProcess {
             // a HashMap;\
 
             String currentLine = commonBufferedReader.readLine();
+            // System.out.println(currentLine);
             String numberOfPreferredNeighborsString = currentLine.split(" ")[1];
             numberOfPreferredNeighbors = Integer.parseInt(numberOfPreferredNeighborsString);
 
@@ -109,7 +110,7 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("./PeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("./LocalPeerInfo.cfg"));
             /*
              * TODO "Local" version is just for testing locally, should be changed for
              * submission
@@ -118,6 +119,7 @@ class peerProcess {
             String[] strings = null;
 
             currentLine = peerInfoBufferedReader.readLine();
+            System.out.println(currentLine);
             while (currentLine != null) {
                 strings = currentLine.split(" ");
                 Peer peer = new Peer(Integer.parseInt(strings[0]), strings[1], Integer.parseInt(strings[2]),
@@ -185,9 +187,11 @@ class peerProcess {
         });
     }
 
+    // from peers that come after
     public static void acceptConnections() {
         PeerListener accept = new PeerListener(peerId);
         Thread t = new Thread(() -> accept.run());
         t.start();
     }
+
 }
