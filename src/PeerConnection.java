@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.InflaterOutputStream;
+import java.nio.*;
 
 public class PeerConnection implements Runnable {
 
@@ -37,19 +38,18 @@ public class PeerConnection implements Runnable {
     public void run() {
         // this part isnt necessary anymore since the socket would already exist from
         // outside
-        try {
-
-            connectionSocket = new Socket(connectedPeer.getHostName(), connectedPeer.getPortNumber());
-            System.err.println(
-                    "Connected to peer " + connectedPeerId + " at port " + connectedPeer.getPortNumber() + "!");
-
-        } catch (UnknownHostException e) {
-            System.err.println("The host listed for peer " + connectedPeerId + " is not recognized");
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        /*
+         * try {
+         * 
+         * connectionSocket = new Socket(connectedPeer.getHostName(),
+         * connectedPeer.getPortNumber()); System.err.println( "Connected to peer " +
+         * connectedPeerId + " at port " + connectedPeer.getPortNumber() + "!");
+         * 
+         * } catch (UnknownHostException e) {
+         * System.err.println("The host listed for peer " + connectedPeerId +
+         * " is not recognized"); e.printStackTrace(); } catch (IOException e) { // TODO
+         * Auto-generated catch block e.printStackTrace(); }
+         */
 
         try {
             inputStream = new BufferedInputStream(connectionSocket.getInputStream());
@@ -74,7 +74,7 @@ public class PeerConnection implements Runnable {
     public synchronized void sendHandshake() {
         String handshakeHeader = "P2PFILESHARINGPROJ";
         byte[] handshakeMessage = new byte[32];
-
+        System.out.println("SENDING HANDSHAKE");
         // string to byte array
         try {
             byte[] header = handshakeHeader.getBytes("UTF-8");
@@ -88,11 +88,16 @@ public class PeerConnection implements Runnable {
         System.arraycopy(padding, 0, handshakeMessage, 18, 10);
 
         // integer to byte array
-        byte[] id = new byte[4];
-        id[0] = (byte) (peerProcess.getPeerId() >>> 24);
-        id[1] = (byte) (peerProcess.getPeerId() >>> 16);
-        id[2] = (byte) (peerProcess.getPeerId() >>> 8);
-        id[3] = (byte) (peerProcess.getPeerId() >>> 0);
+        // byte[] id = new byte[4];
+        /*
+         * id[0] = (byte) (peerProcess.getPeerId() >> 24); id[1] = (byte)
+         * (peerProcess.getPeerId() >> 16); id[2] = (byte) (peerProcess.getPeerId() >>
+         * 8); id[3] = (byte) (peerProcess.getPeerId() >> 0);
+         */
+
+        ByteBuffer idBuf = ByteBuffer.allocate(4);
+        idBuf.putInt(peerProcess.getPeerId());
+        byte[] id = idBuf.array();
 
         System.arraycopy(id, 0, handshakeMessage, 28, 4);
 
@@ -117,20 +122,25 @@ public class PeerConnection implements Runnable {
 
         String handshakeHeader;
         try {
-            handshakeHeader = new String((Arrays.copyOfRange(incomingHandshake, 0, 18)), "UTF_8");
+            handshakeHeader = new String((Arrays.copyOfRange(incomingHandshake, 0, 18)), "UTF-8");
 
             if (handshakeHeader.equals("P2PFILESHARINGPROJ")) {
                 // TODO some logic to see if peerID is the "expected" peer as per the spec
                 byte[] id = (Arrays.copyOfRange(incomingHandshake, 28, 32));
-                int temp = (int) (id[0] << 24);
-                temp += (int) (id[1] << 16);
-                temp += (int) (id[2] << 8);
-                temp += (int) (id[3] << 0);
+                /*
+                 * int temp = (int) (id[0] << 24); System.out.println(temp); temp += (int)
+                 * (id[1] << 16); System.out.println(temp); temp += (int) (id[2] << 8);
+                 * System.out.println(temp); temp += (int) (id[3] << 0);
+                 * System.out.println(temp);
+                 */
+                ByteBuffer wrapper = ByteBuffer.wrap(id);
+                int temp = wrapper.getInt();
 
                 connectedPeerId = temp;
                 connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
+                System.out.println("Handshake received from " + connectedPeerId);
             }
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block

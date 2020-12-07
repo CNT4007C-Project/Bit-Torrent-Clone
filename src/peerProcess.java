@@ -47,6 +47,10 @@ class peerProcess {
         return peerId;
     }
 
+    public static void startNewConnection(Socket s) {
+        // connectionManager.put(i, new PeerConnection(i, toExisting));
+    }
+
     public static int getPieceSize() {
         return pieceSize;
     }

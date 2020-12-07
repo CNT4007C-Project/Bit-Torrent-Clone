@@ -35,6 +35,11 @@ public class PeerListener implements Runnable {
             while (true) {
                 sock = servsock.accept();
                 System.out.println("Peer has connected! : " + sock);
+
+                PeerConnection peer = new PeerConnection(sock); // somehow needs to get into connectionManager once id
+                                                                // is found
+                Thread s = new Thread(() -> peer.run());
+                s.start();
             }
 
         } catch (Exception e) {
