@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.InflaterOutputStream;
+
+import javax.management.ServiceNotFoundException;
+
 import java.nio.*;
 
 public class PeerConnection implements Runnable {
@@ -87,14 +90,6 @@ public class PeerConnection implements Runnable {
         byte[] padding = new byte[10];
         System.arraycopy(padding, 0, handshakeMessage, 18, 10);
 
-        // integer to byte array
-        // byte[] id = new byte[4];
-        /*
-         * id[0] = (byte) (peerProcess.getPeerId() >> 24); id[1] = (byte)
-         * (peerProcess.getPeerId() >> 16); id[2] = (byte) (peerProcess.getPeerId() >>
-         * 8); id[3] = (byte) (peerProcess.getPeerId() >> 0);
-         */
-
         ByteBuffer idBuf = ByteBuffer.allocate(4);
         idBuf.putInt(peerProcess.getPeerId());
         byte[] id = idBuf.array();
@@ -149,6 +144,118 @@ public class PeerConnection implements Runnable {
 
     }
 
+    public void sendChoke() {
+        byte[] chokeMessage = new byte[5];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(0);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, chokeMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.putInt(0);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, chokeMessage, 4, 1);
+
+        try {
+            outputStream.write(chokeMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public void sendUnchoke() {
+        byte[] unchokeMessage = new byte[5];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(0);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, unchokeMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.putInt(1);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, unchokeMessage, 4, 1);
+
+        try {
+            outputStream.write(unchokeMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void sendInterested() {
+        byte[] interestedMessage = new byte[5];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(0);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, interestedMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.putInt(2);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, interestedMessage, 4, 1);
+
+        try {
+            outputStream.write(interestedMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void sendUninterested() {
+        byte[] uninterestedMessage = new byte[5];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(0);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, uninterestedMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.putInt(3);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, uninterestedMessage, 4, 1);
+
+        try {
+            outputStream.write(uninterestedMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void handleBitfield(byte[] peerBitfield) {
+        if (BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), peerBitfield)) {
+            sendInterested();
+        } else {
+            sendUninterested();
+        }
+    }
+
+    public void handlePieceIndex(byte[] p) {
+        int pieceIndex = ByteBuffer.wrap(p).getInt();
+        if (!BitfieldUtility.getBit(peerProcess.getBitfield(), pieceIndex)) { // is this piece one we are missing?
+            sendInterested();
+        }
+    }
+
     public synchronized void sendBitfieldMessage() {
 
         int bitfieldLength = peerProcess.getBitfield().length;
@@ -200,6 +307,7 @@ public class PeerConnection implements Runnable {
         }
 
         int type = messageType[0];
+        int length = ByteBuffer.wrap(messageLength).getInt();
 
         switch (type) {
             case 0: // choke
@@ -214,17 +322,26 @@ public class PeerConnection implements Runnable {
                 byte[] pieceIndex = new byte[4];
                 try {
                     inputStream.read(pieceIndex);
+                    handlePieceIndex(pieceIndex);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
                 break;
-            case 5:
+            case 5: // bitfield
+                byte[] payload = new byte[length];
+                try {
+                    inputStream.read(payload);
+                    BitfieldUtility.printBitfield(payload);
+                    handleBitfield(payload);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
-            case 6:
+            case 6: // request
                 break;
-            case 7:
+            case 7: // piece
                 break;
             default:
                 System.err.println("Message type error!");
