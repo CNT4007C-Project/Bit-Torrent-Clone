@@ -23,6 +23,7 @@ public class PeerListener implements Runnable {
                 sock = servsock.accept(); // whenever this happens it should create a new PeerConnection object and add
                                           // it to the connectionManager
                 System.out.println("Peer has connected! : " + sock);
+                Logger.write("Peer " + peerProcess.getPeerId() + " is connected from Peer " + connectedPeer.getPeerId() + ".");
 
             } catch (Exception e) {
                 // TODO: handle exception

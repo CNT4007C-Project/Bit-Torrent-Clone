@@ -38,10 +38,10 @@ public class PeerConnection implements Runnable {
         // this part isnt necessary anymore since the socket would already exist from
         // outside
         try {
-
             connectionSocket = new Socket(connectedPeer.getHostName(), connectedPeer.getPortNumber());
             System.err.println(
                     "Connected to peer " + connectedPeerId + " at port " + connectedPeer.getPortNumber() + "!");
+            Logger.write("Peer " + peerProcess.getPeerId() + " makes a connection to Peer " + connectedPeerId +".");
 
         } catch (UnknownHostException e) {
             System.err.println("The host listed for peer " + connectedPeerId + " is not recognized");

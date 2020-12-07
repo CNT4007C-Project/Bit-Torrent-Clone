@@ -34,6 +34,7 @@ class peerProcess {
     private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
 
     public static void main(String[] args) {
+        //Do not log before running the next line
         peerId = Integer.parseInt(args[0]);
         System.out.println("Initializing");
         initialize();
@@ -109,7 +110,7 @@ class peerProcess {
             pieceSize = Integer.parseInt(pieceSizeString);
 
             /* Read PeerInfo.cfg */
-            peerInfoBufferedReader = new BufferedReader(new FileReader("./PeerInfo.cfg"));
+            peerInfoBufferedReader = new BufferedReader(new FileReader("./LocalPeerInfo.cfg"));
             /*
              * TODO "Local" version is just for testing locally, should be changed for
              * submission

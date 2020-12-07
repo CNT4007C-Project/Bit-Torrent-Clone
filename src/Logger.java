@@ -9,10 +9,9 @@ within other classes.
 Uses DateTimeHandler to take care of placing [Time] in logs.
 */
 
-public class Logging {
+public class Logger {
     //user working directory + / + log_peer_[peerID].log = ~/Project/log_peer_1001.log
     private static String directory = System.getProperty("user.dir") + "/"; 
-    private static String fileName = null;
     private static FileWriter fileWriter = null;
     private static int peerIdRunning = peerProcess.getPeerId();
 
@@ -26,12 +25,13 @@ public class Logging {
 
     public static void write (int x){ //Writes integer to logs if given a peerId 
         try {
-            fileWriter = new FileWriter(giveAbsDir(peerIdRunning));
+            fileWriter = new FileWriter(giveAbsDir(peerIdRunning),true);
             String fileContent = Integer.toString(x);
             String time = DateTimeHandler.getTime();
             
             fileContent = "[" + time + "]: " + fileContent;
             fileWriter.write(fileContent);
+            fileWriter.write('\n'); 
             fileWriter.close();
         } 
         catch (IOException e) {
@@ -41,12 +41,13 @@ public class Logging {
 
     public static void write (String x){ //Writes Strings to logs if given a peerId
         try { 
-            fileWriter = new FileWriter(giveAbsDir(peerIdRunning));
+            fileWriter = new FileWriter(giveAbsDir(peerIdRunning),true);
             String fileContent = x;
             String time = DateTimeHandler.getTime();
 
             fileContent = "[" + time + "]: " + fileContent;
-            fileWriter.write(x);
+            fileWriter.write(fileContent);
+            fileWriter.write('\n');
             fileWriter.close();
         } 
         catch (IOException e) {
@@ -56,12 +57,13 @@ public class Logging {
 
     public static void write (int peerId, int x){ //Writes integer to logs if given a peerId
         try {
-            fileWriter = new FileWriter(giveAbsDir(peerId));
+            fileWriter = new FileWriter(giveAbsDir(peerId),true);
             String fileContent = Integer.toString(x);
             String time = DateTimeHandler.getTime();
 
             fileContent = "[" + time + "]: " + fileContent;
             fileWriter.write(fileContent);
+            fileWriter.write('\n');
             fileWriter.close();
         } 
         catch (IOException e) {
@@ -71,12 +73,13 @@ public class Logging {
 
     public static void write (int peerId, String x){ //Writes Strings to logs if given a peerId
         try { 
-            fileWriter = new FileWriter(giveAbsDir(peerId));
+            fileWriter = new FileWriter(giveAbsDir(peerId),true);
             String fileContent = x;
             String time = DateTimeHandler.getTime();
 
             fileContent = "[" + time + "]: " + fileContent;
-            fileWriter.write(x);
+            fileWriter.write(fileContent);
+            fileWriter.write('\n');
             fileWriter.close();
         } 
         catch (IOException e) {
