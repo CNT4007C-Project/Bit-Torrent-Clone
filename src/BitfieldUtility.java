@@ -22,6 +22,22 @@ public class BitfieldUtility {
          */
     }
 
+    public static byte[] xor(byte[] b1, byte[] b2) {
+        byte[] res = new byte[b1.length];
+        for (int i = 0; i < b1.length; i++) {
+            res[i] = (byte) (b1[i] ^ b2[i]);
+        }
+        return res;
+    }
+
+    public static byte[] and(byte[] b1, byte[] b2) {
+        byte[] res = new byte[b1.length];
+        for (int i = 0; i < b1.length; i++) {
+            res[i] = (byte) (b1[i] & b2[i]);
+        }
+        return res;
+    }
+
     public static void printBitfield(byte[] b) {
         for (int i = 0; i < b.length * 8; i++) {
             if (getBit(b, i)) {

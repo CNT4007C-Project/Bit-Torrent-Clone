@@ -10,7 +10,9 @@ import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.zip.InflaterOutputStream;
+import java.util.Vector;
 
 import javax.management.ServiceNotFoundException;
 
@@ -24,6 +26,7 @@ public class PeerConnection implements Runnable {
     BufferedInputStream inputStream;
     BufferedOutputStream outputStream;
     private boolean handshakeReceived = false;
+    private boolean isChoked = false;
 
     public PeerConnection(int id, Socket s) { // for requested connections where destination is known
         connectedPeerId = id;
@@ -240,12 +243,38 @@ public class PeerConnection implements Runnable {
         }
     }
 
+    public void sendRequest(byte[] pieceIndex) {
+        byte[] requestMessage = new byte[9];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(4);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, requestMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.putInt(6);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, requestMessage, 4, 1);
+        System.arraycopy(pieceIndex, 0, requestMessage, 5, 4);
+
+        try {
+            outputStream.write(requestMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void handleBitfield(byte[] peerBitfield) {
         if (BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), peerBitfield)) {
             sendInterested();
         } else {
             sendUninterested();
         }
+        // updates bitfield
         connectedPeer.setBitfield(peerBitfield);
     }
 
@@ -318,6 +347,31 @@ public class PeerConnection implements Runnable {
             case 0: // choke
                 break;
             case 1: // unchoke
+                // need to determine piece to ask for
+                byte[] unique = BitfieldUtility.xor(peerProcess.getBitfield(), connectedPeer.getBitfield());
+
+                // show which pieces ONLY the peer has
+                byte[] uniqueToPeer = BitfieldUtility.and(unique, connectedPeer.getBitfield());
+
+                Vector<Integer> neededPieces = new Vector<Integer>();
+
+                // populates the vector with the indices of pieces only peer has
+                for (int i = 0; i < uniqueToPeer.length * 8; i++) {
+                    if (BitfieldUtility.getBit(uniqueToPeer, i)) {
+                        neededPieces.add(i); // adds index for needed piece
+                    }
+                }
+
+                Random random = new Random();
+                int index = random.nextInt(neededPieces.size());
+
+                int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
+
+                ByteBuffer indexBuf = ByteBuffer.allocate(4);
+                indexBuf.putInt(pieceIndexInt);
+                byte[] pieceIndex = indexBuf.array();
+
+                sendRequest(pieceIndex);
                 break;
             case 2: // interested
                 break;
