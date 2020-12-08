@@ -34,7 +34,7 @@ class peerProcess {
     private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
 
     public static void main(String[] args) {
-        //Do not log before running the next line
+        // Do not log before running the next line
         peerId = Integer.parseInt(args[0]);
         System.out.println("Initializing");
         initialize();
@@ -176,11 +176,9 @@ class peerProcess {
 
                 System.err.println("Connected to peer " + i + " at port " + existingPeer.getPortNumber() + "!");
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 System.err.println("The host listed for peer " + i + " is not recognized");
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             connectionManager.put(i, new PeerConnection(i, toExisting));

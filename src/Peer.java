@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+
 // stores data for each peer learned from PeerInfo.cfg
 
 public class Peer {
@@ -41,6 +43,11 @@ public class Peer {
 
     public byte[] getBitfield() {
         return bitfield;
+    }
+
+    public void updateBitfield(byte[] pieceIndex) {
+        int index = ByteBuffer.wrap(pieceIndex).getInt();
+        BitfieldUtility.setBit(bitfield, index, true);
     }
 
     public void setBitfield(byte[] b) {

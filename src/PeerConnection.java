@@ -122,16 +122,15 @@ public class PeerConnection implements Runnable {
             if (handshakeHeader.equals("P2PFILESHARINGPROJ")) {
                 // TODO some logic to see if peerID is the "expected" peer as per the spec
                 byte[] id = (Arrays.copyOfRange(incomingHandshake, 28, 32));
-                /*
-                 * int temp = (int) (id[0] << 24); System.out.println(temp); temp += (int)
-                 * (id[1] << 16); System.out.println(temp); temp += (int) (id[2] << 8);
-                 * System.out.println(temp); temp += (int) (id[3] << 0);
-                 * System.out.println(temp);
-                 */
                 ByteBuffer wrapper = ByteBuffer.wrap(id);
                 int temp = wrapper.getInt();
 
-                connectedPeerId = temp;
+                if (connectedPeerId == 0) {
+                    connectedPeerId = temp;
+                } else if (connectedPeerId != temp) {
+                    System.out.println("unexpected peer id");
+                }
+
                 connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
@@ -247,13 +246,19 @@ public class PeerConnection implements Runnable {
         } else {
             sendUninterested();
         }
+        connectedPeer.setBitfield(peerBitfield);
     }
 
     public void handlePieceIndex(byte[] p) {
         int pieceIndex = ByteBuffer.wrap(p).getInt();
         if (!BitfieldUtility.getBit(peerProcess.getBitfield(), pieceIndex)) { // is this piece one we are missing?
             sendInterested();
+        } else {
+            sendUninterested();
         }
+        // updates bitfield
+        connectedPeer.updateBitfield(p);
+
     }
 
     public synchronized void sendBitfieldMessage() {
