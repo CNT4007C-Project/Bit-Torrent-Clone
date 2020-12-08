@@ -319,6 +319,33 @@ public class PeerConnection implements Runnable {
 
     }
 
+    public byte[] pickPieceIndex() {
+        // need to determine piece to ask for
+        byte[] unique = BitfieldUtility.xor(peerProcess.getBitfield(), connectedPeer.getBitfield());
+
+        // show which pieces ONLY the peer has
+        byte[] uniqueToPeer = BitfieldUtility.and(unique, connectedPeer.getBitfield());
+
+        Vector<Integer> neededPieces = new Vector<Integer>();
+
+        // populates the vector with the indices of pieces only peer has
+        for (int i = 0; i < uniqueToPeer.length * 8; i++) {
+            if (BitfieldUtility.getBit(uniqueToPeer, i)) {
+                neededPieces.add(i); // adds index for needed piece
+            }
+        }
+
+        Random random = new Random();
+        int index = random.nextInt(neededPieces.size());
+
+        int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
+
+        ByteBuffer indexBuf = ByteBuffer.allocate(4);
+        indexBuf.putInt(pieceIndexInt);
+        byte[] pIndex = indexBuf.array();
+        return pIndex;
+    }
+
     public void listenForMessages() {
 
         while (true) { // once again, this should probably be a thread
@@ -347,31 +374,8 @@ public class PeerConnection implements Runnable {
             case 0: // choke
                 break;
             case 1: // unchoke
-                // need to determine piece to ask for
-                byte[] unique = BitfieldUtility.xor(peerProcess.getBitfield(), connectedPeer.getBitfield());
-
-                // show which pieces ONLY the peer has
-                byte[] uniqueToPeer = BitfieldUtility.and(unique, connectedPeer.getBitfield());
-
-                Vector<Integer> neededPieces = new Vector<Integer>();
-
-                // populates the vector with the indices of pieces only peer has
-                for (int i = 0; i < uniqueToPeer.length * 8; i++) {
-                    if (BitfieldUtility.getBit(uniqueToPeer, i)) {
-                        neededPieces.add(i); // adds index for needed piece
-                    }
-                }
-
-                Random random = new Random();
-                int index = random.nextInt(neededPieces.size());
-
-                int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
-
-                ByteBuffer indexBuf = ByteBuffer.allocate(4);
-                indexBuf.putInt(pieceIndexInt);
-                byte[] pIndex = indexBuf.array();
-
-                sendRequest(pIndex);
+                byte[] piece = pickPieceIndex();
+                sendRequest(piece);
                 break;
             case 2: // interested
                 break;
@@ -399,8 +403,13 @@ public class PeerConnection implements Runnable {
                 }
                 break;
             case 6: // request
+                // TODO: send piece
                 break;
             case 7: // piece
+                // TODO: first download piece
+                // after download, request another
+                piece = pickPieceIndex();
+                sendRequest(piece);
                 break;
             default:
                 System.err.println("Message type error!");
