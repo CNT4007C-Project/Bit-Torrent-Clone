@@ -369,9 +369,9 @@ public class PeerConnection implements Runnable {
 
                 ByteBuffer indexBuf = ByteBuffer.allocate(4);
                 indexBuf.putInt(pieceIndexInt);
-                byte[] pieceIndex = indexBuf.array();
+                byte[] pIndex = indexBuf.array();
 
-                sendRequest(pieceIndex);
+                sendRequest(pIndex);
                 break;
             case 2: // interested
                 break;
