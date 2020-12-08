@@ -34,8 +34,9 @@ public class PeerListener implements Runnable {
 
             while (true) {
                 sock = servsock.accept();
-                System.out.println("Peer has connected! : " + sock);
-                Logger.write("Peer " + peerProcess.getPeerId() + " is connected from Peer " + connectedPeer.getPeerId() + ".");
+                // System.out.println("Peer has connected! : " + sock);
+                // Logger.write("Peer " + peerProcess.getPeerId() + " is connected from Peer " +
+                // connectedPeer.getPeerId() + ".");
 
                 PeerConnection peer = new PeerConnection(sock); // somehow needs to get into connectionManager once id
                                                                 // is found
@@ -45,6 +46,7 @@ public class PeerListener implements Runnable {
 
         } catch (Exception e) {
             // TODO: handle excpetion
+            e.printStackTrace();
         }
     }
 }

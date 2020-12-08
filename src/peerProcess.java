@@ -174,6 +174,7 @@ class peerProcess {
 
                 toExisting = new Socket(existingPeer.getHostName(), existingPeer.getPortNumber());
 
+                Logger.write("Peer " + peerId + " makes a connection to Peer " + i + ".");
                 System.err.println("Connected to peer " + i + " at port " + existingPeer.getPortNumber() + "!");
             } catch (UnknownHostException e) {
                 System.err.println("The host listed for peer " + i + " is not recognized");

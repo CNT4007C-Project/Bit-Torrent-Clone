@@ -130,6 +130,8 @@ public class PeerConnection implements Runnable {
 
                 if (connectedPeerId == 0) {
                     connectedPeerId = temp;
+                    Logger.write(
+                            "Peer " + peerProcess.getPeerId() + " is connected from Peer " + connectedPeerId + ".");
                 } else if (connectedPeerId != temp) {
                     System.out.println("unexpected peer id");
                 }
@@ -137,7 +139,7 @@ public class PeerConnection implements Runnable {
                 connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
-                System.out.println("Handshake received from " + connectedPeerId);
+                // System.out.println("Handshake received from " + connectedPeerId);
             }
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
@@ -156,7 +158,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageLength, 0, chokeMessage, 0, 4);
 
         ByteBuffer typeBuf = ByteBuffer.allocate(1);
-        typeBuf.putInt(0);
+        typeBuf.put((byte) 0);
         byte[] messageType = typeBuf.array();
 
         System.arraycopy(messageType, 0, chokeMessage, 4, 1);
@@ -181,7 +183,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageLength, 0, unchokeMessage, 0, 4);
 
         ByteBuffer typeBuf = ByteBuffer.allocate(1);
-        typeBuf.putInt(1);
+        typeBuf.put((byte) 1);
         byte[] messageType = typeBuf.array();
 
         System.arraycopy(messageType, 0, unchokeMessage, 4, 1);
@@ -205,7 +207,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageLength, 0, interestedMessage, 0, 4);
 
         ByteBuffer typeBuf = ByteBuffer.allocate(1);
-        typeBuf.putInt(2);
+        typeBuf.put((byte) 2);
         byte[] messageType = typeBuf.array();
 
         System.arraycopy(messageType, 0, interestedMessage, 4, 1);
@@ -229,7 +231,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageLength, 0, uninterestedMessage, 0, 4);
 
         ByteBuffer typeBuf = ByteBuffer.allocate(1);
-        typeBuf.putInt(3);
+        typeBuf.put((byte) 3);
         byte[] messageType = typeBuf.array();
 
         System.arraycopy(messageType, 0, uninterestedMessage, 4, 1);
@@ -253,7 +255,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageLength, 0, requestMessage, 0, 4);
 
         ByteBuffer typeBuf = ByteBuffer.allocate(1);
-        typeBuf.putInt(6);
+        typeBuf.put((byte) 6);
         byte[] messageType = typeBuf.array();
 
         System.arraycopy(messageType, 0, requestMessage, 4, 1);
@@ -372,20 +374,28 @@ public class PeerConnection implements Runnable {
 
         switch (type) {
             case 0: // choke
+                Logger.write("Peer " + peerProcess.getPeerId() + " is choked by " + connectedPeerId + ".");
                 break;
             case 1: // unchoke
+                Logger.write("Peer " + peerProcess.getPeerId() + " is unchoked by " + connectedPeerId + ".");
                 byte[] piece = pickPieceIndex();
                 sendRequest(piece);
                 break;
             case 2: // interested
+                Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘interested’ message from "
+                        + connectedPeerId + ".");
                 break;
             case 3: // not interested
+                Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘not interested’ message from "
+                        + connectedPeerId + ".");
                 break;
             case 4: // have
                 byte[] pieceIndex = new byte[4];
                 try {
                     inputStream.read(pieceIndex);
                     handlePieceIndex(pieceIndex);
+                    Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘have’ message from "
+                            + connectedPeerId + " for the piece " + ByteBuffer.wrap(pieceIndex).getInt() + ".");
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
