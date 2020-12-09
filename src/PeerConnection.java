@@ -382,10 +382,12 @@ public class PeerConnection implements Runnable {
                 sendRequest(piece);
                 break;
             case 2: // interested
+                connectedPeer.becomeInterested();
                 Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘interested’ message from "
                         + connectedPeerId + ".");
                 break;
             case 3: // not interested
+                connectedPeer.becomeUninterested();
                 Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘not interested’ message from "
                         + connectedPeerId + ".");
                 break;
@@ -405,7 +407,6 @@ public class PeerConnection implements Runnable {
                 byte[] payload = new byte[length];
                 try {
                     inputStream.read(payload);
-                    BitfieldUtility.printBitfield(payload);
                     handleBitfield(payload);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
