@@ -374,6 +374,34 @@ public class PeerConnection implements Runnable {
         return pIndex;
     }
 
+    public void sendPiece(byte[] pieceIndex) {
+        byte[] pieceMessage = new byte[4 + 1 + 4 + peerProcess.getPieceSize()];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(4 + peerProcess.getPieceSize());
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, pieceMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.put((byte) 7);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, pieceMessage, 4, 1);
+        System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
+
+        // TODO: get the file piece
+        System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
+
+        try {
+            outputStream.write(pieceMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void listenForMessages() {
 
         while (true) { // once again, this should probably be a thread
@@ -418,8 +446,8 @@ public class PeerConnection implements Runnable {
                         + connectedPeerId + ".");
                 break;
             case 4: // have
-                byte[] pieceIndex = new byte[4];
                 try {
+                    byte[] pieceIndex = new byte[4];
                     inputStream.read(pieceIndex);
                     handlePieceIndex(pieceIndex);
                     Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘have’ message from "
@@ -430,8 +458,8 @@ public class PeerConnection implements Runnable {
                 }
                 break;
             case 5: // bitfield
-                byte[] payload = new byte[length];
                 try {
+                    byte[] payload = new byte[length];
                     inputStream.read(payload);
                     handleBitfield(payload);
                 } catch (IOException e) {
@@ -440,12 +468,20 @@ public class PeerConnection implements Runnable {
                 }
                 break;
             case 6: // request
-                // TODO: send piece
+                try {
+                    byte[] pieceIndex = new byte[4];
+                    inputStream.read(pieceIndex);
+
+                    // TODO: send piece
+                    sendPiece(pieceIndex);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
             case 7: // piece
-                pieceIndex = new byte[4];
-
                 try {
+                    byte[] pieceIndex = new byte[4];
                     inputStream.read(pieceIndex);
                     int index = ByteBuffer.wrap(pieceIndex).getInt();
 
@@ -475,8 +511,8 @@ public class PeerConnection implements Runnable {
                     });
 
                     // after download, request another
-                    piece = pickPieceIndex();
-                    sendRequest(piece);
+                    byte[] p = pickPieceIndex();
+                    sendRequest(p);
 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
