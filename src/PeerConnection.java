@@ -271,6 +271,31 @@ public class PeerConnection implements Runnable {
         }
     }
 
+    public void sendHave(byte[] pieceIndex) {
+        byte[] haveMessage = new byte[9];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(4);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, haveMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.put((byte) 4);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, haveMessage, 4, 1);
+        System.arraycopy(pieceIndex, 0, haveMessage, 5, 4);
+
+        try {
+            outputStream.write(haveMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void handleBitfield(byte[] peerBitfield) {
         if (BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), peerBitfield)) {
             sendInterested();
@@ -446,7 +471,7 @@ public class PeerConnection implements Runnable {
                             // if a neighbor is no longer interesting, tell them so on that connection
                             peer.sendUninterested();
                         }
-                        peer.sendHave(pieceIndex); // IMPLEMENT THIS
+                        peer.sendHave(pieceIndex);
                     });
 
                     // after download, request another
