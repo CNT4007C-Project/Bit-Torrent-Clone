@@ -10,54 +10,23 @@ Uses DateTimeHandler to take care of placing [Time] in logs.
 */
 
 public class Logger {
-    //user working directory + / + log_peer_[peerID].log = ~/Project/log_peer_1001.log
-    private static String directory = System.getProperty("user.dir") + "/"; 
-    private static FileWriter fileWriter = null;
+    // user working directory + / + log_peer_[peerID].log =
+    // ~/Project/log_peer_1001.log
+    private static String directory = System.getProperty("user.dir") + "/";
+    // private static FileWriter fileWriter = null;
     private static int peerIdRunning = peerProcess.getPeerId();
 
-    private static String fileNamePeer(int peerId){
-        return "log_peer_" + Integer.toString(peerId) + ".log"; 
+    private static String fileNamePeer(int peerId) {
+        return "log_peer_" + Integer.toString(peerId) + ".log";
     }
 
-    private static String giveAbsDir(int peerId){
+    private static String giveAbsDir(int peerId) {
         return directory + fileNamePeer(peerId);
     }
 
-    public static void write (int x){ //Writes integer to logs if given a peerId 
+    public static void write(int x) { // Writes integer to logs if given a peerId
         try {
-            fileWriter = new FileWriter(giveAbsDir(peerIdRunning),true);
-            String fileContent = Integer.toString(x);
-            String time = DateTimeHandler.getTime();
-            
-            fileContent = "[" + time + "]: " + fileContent;
-            fileWriter.write(fileContent);
-            fileWriter.write('\n'); 
-            fileWriter.close();
-        } 
-        catch (IOException e) {
-            System.out.println(e);
-        }
-    }
-
-    public static void write (String x){ //Writes Strings to logs if given a peerId
-        try { 
-            fileWriter = new FileWriter(giveAbsDir(peerIdRunning),true);
-            String fileContent = x;
-            String time = DateTimeHandler.getTime();
-
-            fileContent = "[" + time + "]: " + fileContent;
-            fileWriter.write(fileContent);
-            fileWriter.write('\n');
-            fileWriter.close();
-        } 
-        catch (IOException e) {
-            System.out.println(e);
-        }
-    }
-
-    public static void write (int peerId, int x){ //Writes integer to logs if given a peerId
-        try {
-            fileWriter = new FileWriter(giveAbsDir(peerId),true);
+            FileWriter fileWriter = new FileWriter(giveAbsDir(peerIdRunning), true);
             String fileContent = Integer.toString(x);
             String time = DateTimeHandler.getTime();
 
@@ -65,15 +34,14 @@ public class Logger {
             fileWriter.write(fileContent);
             fileWriter.write('\n');
             fileWriter.close();
-        } 
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println(e);
         }
     }
 
-    public static void write (int peerId, String x){ //Writes Strings to logs if given a peerId
-        try { 
-            fileWriter = new FileWriter(giveAbsDir(peerId),true);
+    public static void write(String x) { // Writes Strings to logs if given a peerId
+        try {
+            FileWriter fileWriter = new FileWriter(giveAbsDir(peerIdRunning), true);
             String fileContent = x;
             String time = DateTimeHandler.getTime();
 
@@ -81,16 +49,46 @@ public class Logger {
             fileWriter.write(fileContent);
             fileWriter.write('\n');
             fileWriter.close();
-        } 
-        catch (IOException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void write(int peerId, int x) { // Writes integer to logs if given a peerId
+        try {
+            FileWriter fileWriter = new FileWriter(giveAbsDir(peerId), true);
+            String fileContent = Integer.toString(x);
+            String time = DateTimeHandler.getTime();
+
+            fileContent = "[" + time + "]: " + fileContent;
+            fileWriter.write(fileContent);
+            fileWriter.write('\n');
+            fileWriter.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void write(int peerId, String x) { // Writes Strings to logs if given a peerId
+        try {
+            FileWriter fileWriter = new FileWriter(giveAbsDir(peerId), true);
+            String fileContent = x;
+            String time = DateTimeHandler.getTime();
+
+            fileContent = "[" + time + "]: " + fileContent;
+            fileWriter.write(fileContent);
+            fileWriter.write('\n');
+            fileWriter.close();
+        } catch (IOException e) {
             System.out.println(e);
         }
     }
 }
 
-
-/* Reference:
-
-File Reading and Writing: https://stackabuse.com/reading-and-writing-files-in-java/
-
-*/
+/*
+ * Reference:
+ * 
+ * File Reading and Writing:
+ * https://stackabuse.com/reading-and-writing-files-in-java/
+ * 
+ */
