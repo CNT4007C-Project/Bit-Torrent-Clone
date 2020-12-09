@@ -16,6 +16,8 @@ import java.util.Vector;
 
 import javax.management.ServiceNotFoundException;
 
+import jdk.internal.org.jline.terminal.Terminal;
+
 import java.nio.*;
 
 public class PeerConnection implements Runnable {
@@ -27,17 +29,24 @@ public class PeerConnection implements Runnable {
     BufferedOutputStream outputStream;
     private boolean handshakeReceived = false;
     private boolean isChoked = false;
+    private volatile boolean running;
 
     public PeerConnection(int id, Socket s) { // for requested connections where destination is known
         connectedPeerId = id;
         connectedPeer = peerProcess.getPeerDictionary().get(id);
         connectionSocket = s;
+        running = true;
     }
 
     public PeerConnection(Socket s) { // for listened connections when peer ID is unknown
         connectedPeerId = 0;
         connectedPeer = null;
         connectionSocket = s;
+        running = true;
+    }
+
+    public void terminate() {
+        running = false;
     }
 
     @Override
@@ -73,6 +82,7 @@ public class PeerConnection implements Runnable {
             // start regular message process
             sendBitfieldMessage();
             listenForMessages(); // TODO this needs to be a thread
+            // listen is on while loop until this thread is called to terminate
         }
 
     }
@@ -350,7 +360,7 @@ public class PeerConnection implements Runnable {
 
     public void listenForMessages() {
 
-        while (true) { // once again, this should probably be a thread
+        while (running) { // once again, this should probably be a thread
             processMessage();
         }
 

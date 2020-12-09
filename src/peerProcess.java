@@ -3,10 +3,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
+
+import sun.tools.serialver.resources.serialver_ja;
 
 // this process should take in the peerID as an argument and run the peer process
 
@@ -34,6 +38,7 @@ class peerProcess {
 
     private static byte[] bitField;
     private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
+    private static PeerListener listenerObj;
 
     public static void main(String[] args) {
         // Do not log before running the next line
@@ -45,13 +50,22 @@ class peerProcess {
         System.out.println("Starting Sending Connections");
         requestConnections();
         boolean allPeersHaveFile = false;
+        long previousUnchoke = System.currentTimeMillis();
+        long previousOptimUnchoke = System.currentTimeMillis();
+        
         while(!allPeersHaveFile) {
 
-            for (Map.Entry<Integer, Peer> entry : peerDictionary.entrySet()) {
+        
 
+            allPeersHaveFile = true;
+            for (HashMap.Entry<Integer, Peer> entry : peerDictionary.entrySet()) {
+                if (!entry.getValue().getHasFile()) {
+                    allPeersHaveFile = false;
+                    break;
+                }
             }
         }
-
+        terminateThreads();
     }
 
     public static int getPeerId() {
@@ -205,11 +219,17 @@ class peerProcess {
     public static void acceptConnections() {
         PeerListener accept = new PeerListener(peerId);
         Thread t = new Thread(() -> accept.run());
+        listenerObj = accept;
         t.start();
     }
 
-    public void chokeTimer extends TimerTask {
-
+    private static void terminateThreads() {
+        //Log here
+        for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+            entry.getValue().terminate();
+        }
+        listenerObj.terminate();
     }
+
 
 }
