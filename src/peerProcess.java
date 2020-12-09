@@ -31,7 +31,7 @@ class peerProcess {
                                                                             // THIS one
 
     private static byte[] bitField;
-    private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
+    private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<Integer, PeerConnection>();
 
     public static void main(String[] args) {
         // Do not log before running the next line
@@ -66,6 +66,10 @@ class peerProcess {
 
     public static HashMap<Integer, Peer> getPeerDictionary() {
         return peerDictionary;
+    }
+
+    public static HashMap<Integer, PeerConnection> getConnectionManager() {
+        return connectionManager;
     }
 
     public static byte[] getBitfield() {

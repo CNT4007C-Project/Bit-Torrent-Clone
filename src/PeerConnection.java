@@ -137,6 +137,7 @@ public class PeerConnection implements Runnable {
                 }
 
                 connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
+                peerProcess.getConnectionManager().put(connectedPeerId, this);
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
                 // System.out.println("Handshake received from " + connectedPeerId);
@@ -417,10 +418,45 @@ public class PeerConnection implements Runnable {
                 // TODO: send piece
                 break;
             case 7: // piece
-                // TODO: first download piece
-                // after download, request another
-                piece = pickPieceIndex();
-                sendRequest(piece);
+                pieceIndex = new byte[4];
+
+                try {
+                    inputStream.read(pieceIndex);
+                    int index = ByteBuffer.wrap(pieceIndex).getInt();
+
+                    // TODO: first download piece
+
+                    // updating THIS bitfield
+                    BitfieldUtility.setBit(peerProcess.getBitfield(), index, true);
+
+                    // count how many pieces
+                    int numPieces = 0;
+                    for (int i = 0; i < peerProcess.getBitfield().length * 8; i++) {
+                        if (BitfieldUtility.getBit(peerProcess.getBitfield(), i)) {
+                            numPieces++;
+                        }
+                    }
+
+                    Logger.write("Peer " + peerProcess.getPeerId() + " has downloaded the piece " + index + " from "
+                            + connectedPeerId + ". Now the number of pieces it has is " + numPieces + ".");
+
+                    // check neighbors to see if it should still interested
+                    peerProcess.getConnectionManager().forEach((id, peer) -> {
+                        if (!BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), connectedPeer.getBitfield())) {
+                            // if a neighbor is no longer interesting, tell them so on that connection
+                            peer.sendUninterested();
+                        }
+                        peer.sendHave(pieceIndex); // IMPLEMENT THIS
+                    });
+
+                    // after download, request another
+                    piece = pickPieceIndex();
+                    sendRequest(piece);
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
             default:
                 System.err.println("Message type error!");
