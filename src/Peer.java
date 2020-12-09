@@ -9,6 +9,7 @@ public class Peer {
     private int hasFile;
     private byte[] bitfield;
     private boolean interested;
+    private boolean choked;
 
     public Peer(int _peerId, String _hostName, int _portNumber, int _hasFile) {
         peerId = _peerId;
@@ -17,6 +18,7 @@ public class Peer {
         hasFile = _hasFile;
         bitfield = new byte[(int) Math.ceil((double) peerProcess.getPieces() / 8.0)];
         interested = false;
+        choked = false;
 
         if (_hasFile == 1) { // populate bitfield with 1's
             for (int i = 0; i < peerProcess.getPieces(); i++) {
@@ -57,6 +59,18 @@ public class Peer {
 
     public void becomeUninterested() {
         interested = false;
+    }
+
+    public boolean isChoked() {
+        return choked;
+    }
+
+    public void choke() {
+        choked = true;
+    }
+
+    public void unchoke() {
+        choked = false;
     }
 
     public void updateBitfield(byte[] pieceIndex) {
