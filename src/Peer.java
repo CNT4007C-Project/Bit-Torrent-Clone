@@ -76,9 +76,26 @@ public class Peer {
     public void updateBitfield(byte[] pieceIndex) {
         int index = ByteBuffer.wrap(pieceIndex).getInt();
         BitfieldUtility.setBit(bitfield, index, true);
+        fileStatusCheck();
     }
 
     public void setBitfield(byte[] b) {
         bitfield = b;
+        fileStatusCheck();
     }
+
+    private void fileStatusCheck() {
+        boolean complete = true;
+        for (byte b : bitfield) {
+            if (b != 1) {
+                complete = false;
+                break;
+            }
+        }
+        if (complete) {
+            hasFile = 1;
+        }
+
+    }
+
 }

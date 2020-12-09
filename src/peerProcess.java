@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 // this process should take in the peerID as an argument and run the peer process
 
@@ -42,6 +44,14 @@ class peerProcess {
         acceptConnections();
         System.out.println("Starting Sending Connections");
         requestConnections();
+        boolean allPeersHaveFile = false;
+        while(!allPeersHaveFile) {
+
+            for (Map.Entry<Integer, Peer> entry : peerDictionary.entrySet()) {
+
+            }
+        }
+
     }
 
     public static int getPeerId() {
@@ -196,6 +206,10 @@ class peerProcess {
         PeerListener accept = new PeerListener(peerId);
         Thread t = new Thread(() -> accept.run());
         t.start();
+    }
+
+    public void chokeTimer extends TimerTask {
+
     }
 
 }
