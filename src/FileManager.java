@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class FileMgr {
+public class FileManager {
 
     private static int fileSize = peerProcess.getFileSize(); 
     private static int pieceSize = peerProcess.getPieceSize();
@@ -17,7 +17,7 @@ public class FileMgr {
     private static HashMap<Integer, Boolean> pieceCheck;
     private static boolean hasAllPieces = false;
     
-    public FileMgr(){
+    public FileManager(){
 
     }
 
