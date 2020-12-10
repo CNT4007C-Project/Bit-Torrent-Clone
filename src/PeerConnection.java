@@ -391,7 +391,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
 
         // TODO: get the file piece
-        System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
+        // System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
 
         try {
             outputStream.write(pieceMessage);
@@ -400,6 +400,10 @@ public class PeerConnection implements Runnable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public void downloadPiece(int index, byte[] piece) {
+        // TODO: download the piece
     }
 
     public void listenForMessages() {
@@ -485,7 +489,10 @@ public class PeerConnection implements Runnable {
                     inputStream.read(pieceIndex);
                     int index = ByteBuffer.wrap(pieceIndex).getInt();
 
-                    // TODO: first download piece
+                    // first download piece
+                    int pieceSize = ByteBuffer.wrap(messageLength).getInt() - 4;
+                    byte[] filePiece = new byte[pieceSize];
+                    downloadPiece(index, filePiece); // TODO: implement this!!!!!
 
                     // updating THIS bitfield
                     BitfieldUtility.setBit(peerProcess.getBitfield(), index, true);
