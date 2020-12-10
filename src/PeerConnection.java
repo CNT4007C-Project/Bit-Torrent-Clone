@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import javax.management.ServiceNotFoundException;
 
-import jdk.internal.org.jline.terminal.Terminal;
 
 import java.nio.*;
 

@@ -13,7 +13,6 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Random;
 
-import sun.tools.serialver.resources.serialver_ja;
 
 // this process should take in the peerID as an argument and run the peer process
 

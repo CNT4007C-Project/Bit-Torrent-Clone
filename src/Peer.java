@@ -73,14 +73,6 @@ public class Peer {
         choked = false;
     }
 
-    public long chokeTime() {
-        return previousChoke;
-    }
-
-    public long optimumChokeTime() {
-        return previousOptimumChoke;
-    }
-
     public void updateBitfield(byte[] pieceIndex) {
         int index = ByteBuffer.wrap(pieceIndex).getInt();
         BitfieldUtility.setBit(bitfield, index, true);
