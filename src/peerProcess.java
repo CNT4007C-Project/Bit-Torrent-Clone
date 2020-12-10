@@ -6,6 +6,8 @@ import java.net.UnknownHostException;
 import java.util.BitSet;
 import java.util.HashMap;
 
+import com.apple.eio.FileManager;
+
 // this process should take in the peerID as an argument and run the peer process
 
 // TODO figure out if subdirectories should be created at runtime or manually beforehand
@@ -25,6 +27,7 @@ class peerProcess {
     private static String fileName;
     private static int fileSize;
     private static int pieceSize;
+    private static FileManager fileManager;
 
     // PeerInfo.cfg variables
     private static HashMap<Integer, Peer> peerDictionary = new HashMap<>(); // includes info of every peer including
@@ -38,6 +41,7 @@ class peerProcess {
         peerId = Integer.parseInt(args[0]);
         System.out.println("Initializing");
         initialize();
+        fileManager = new FileManager();
         System.out.println("Starting Receiving Connections");
         acceptConnections();
         System.out.println("Starting Sending Connections");
@@ -46,6 +50,10 @@ class peerProcess {
 
     public static int getPeerId() {
         return peerId;
+    }
+
+    public static FileManager getFileManager() {
+        return fileManager;
     }
 
     public static void startNewConnection(Socket s) {

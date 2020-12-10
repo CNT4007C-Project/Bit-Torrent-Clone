@@ -390,8 +390,8 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageType, 0, pieceMessage, 4, 1);
         System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
 
-        // TODO: get the file piece
-        byte[] filePiece = someFunction(pieceIndex);
+        // get the file piece
+        byte[] filePiece = peerProcess.getFileManager().fileToPieces(ByteBuffer.wrap(pieceIndex).getInt());
         System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
 
         try {
@@ -404,7 +404,8 @@ public class PeerConnection implements Runnable {
     }
 
     public void downloadPiece(int index, byte[] piece) {
-        // TODO: download the piece
+        // download the piece
+        peerProcess.getFileManager().piecesToFile(index, piece);
     }
 
     public void listenForMessages() {
