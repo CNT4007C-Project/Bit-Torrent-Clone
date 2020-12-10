@@ -1,12 +1,12 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class PeerListener implements Runnable {
     private Socket connectionSocket;
     private int connectedPeerId;
     private Peer connectedPeer;
-    private PeerConnection connectionObj;
     private Socket sock;
     private volatile boolean running;
 
@@ -25,6 +25,10 @@ public class PeerListener implements Runnable {
         } catch (IOException e) {
             //Socket forced to close
         }
+    }
+
+    public void sendStartChoke() {
+        //Choke all peers that connect to this peer
     }
 
     // @Override
@@ -57,7 +61,7 @@ public class PeerListener implements Runnable {
                 PeerConnection peer = new PeerConnection(sock); // somehow needs to get into connectionManager once id
                                                                 // is found
                 Thread s = new Thread(() -> peer.run());
-                connectionObj = peer;
+                //peer.sendChoke(); //idk if this can run threadsafe here
                 s.start();
             }
 
@@ -67,8 +71,6 @@ public class PeerListener implements Runnable {
             // TODO: handle excpetion
             e.printStackTrace();
         }
-        
-        connectionObj.terminate();
         
     }
 }

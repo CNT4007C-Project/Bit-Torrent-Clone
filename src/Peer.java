@@ -10,8 +10,6 @@ public class Peer {
     private byte[] bitfield;
     private boolean interested;
     private boolean choked;
-    private long previousChoke;
-    private long previousOptimumChoke;
 
     public Peer(int _peerId, String _hostName, int _portNumber, int _hasFile) {
         peerId = _peerId;
@@ -20,9 +18,7 @@ public class Peer {
         hasFile = _hasFile;
         bitfield = new byte[(int) Math.ceil((double) peerProcess.getPieces() / 8.0)];
         interested = false;
-        choked = false;
-        previousChoke = System.currentTimeMillis();
-        previousOptimumChoke = System.currentTimeMillis();
+        choked = true;
 
         if (_hasFile == 1) { // populate bitfield with 1's
             for (int i = 0; i < peerProcess.getPieces(); i++) {
@@ -101,8 +97,11 @@ public class Peer {
         boolean complete = true;
         for (int i = 0; i < bitfield.length; i++) {
             if (i == bitfield.length-1) {
-                if (Byte.valueOf(bitfield[i]) > 0)
-            } else if (Byte.valueOf(bitfield[i]) == Byte.MAX_VALUE) {
+                if (Byte.valueOf(bitfield[i]) != Byte.MAX_VALUE) {
+                    complete = false;
+                    break;
+                }
+            } else if (Byte.valueOf(bitfield[i]) != Byte.MAX_VALUE) {
                 complete = false;
                 break;
             }

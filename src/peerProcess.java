@@ -5,10 +5,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.Random;
 
 import sun.tools.serialver.resources.serialver_ja;
 
@@ -49,13 +52,127 @@ class peerProcess {
         acceptConnections();
         System.out.println("Starting Sending Connections");
         requestConnections();
+        
         boolean allPeersHaveFile = false;
         long previousUnchoke = System.currentTimeMillis();
         long previousOptimUnchoke = System.currentTimeMillis();
         
-        while(!allPeersHaveFile) {
+        /*
+        Peer peer = peerDictionary.get(peerId);
+        for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+            // Clients start by choked and not interested
+            entry.getValue().sendChoke();
+        }
+        // Listener should choke new connections automatically
+        // Should be fine not to choke anything at beginning
+        */
 
-        
+        boolean first = true;
+        // ASSUMING THAT connectionManager has all peers
+
+        Integer[] preferredNeighbors = new Integer[numberOfPreferredNeighbors];
+        HashMap<Integer, Integer> downloadRate = new HashMap<>();
+        Random random = new Random();
+        ArrayList<Integer> unchoked = new ArrayList<>();
+        ArrayList<Integer> choked = new ArrayList<>();
+        while(!allPeersHaveFile) {
+            
+            ArrayList<Integer> interested = new ArrayList<>();
+            for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+                if (entry.getValue().isInterested()) {
+                    interested.add(entry.getKey());
+                }
+            }
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - previousUnchoke > unchokingInterval) {
+                if (first) {
+                    Object[] peers = peerDictionary.keySet().toArray();
+                    for (int i = 0; i < numberOfPreferredNeighbors; i++) {
+                        int choice;
+                        do {
+                            choice = (Integer) peers[random.nextInt(peers.length)];
+                        } while (choice == peerId);
+                        preferredNeighbors[i] = choice;
+                    }
+                    for (int i = 0; i < numberOfPreferredNeighbors; i++) {
+                        connectionManager.get(preferredNeighbors[i]).sendUnchoke();
+                    }
+                } else {
+                    ArrayList<Integer> sorted = new ArrayList<>();
+                    for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+                        downloadRate.put(entry.getKey(), entry.getValue().piecesReceived());
+                        boolean inserted = false;
+                        for (int i = 0; i < sorted.size(); i++) {
+                            if (sorted.get(i) > entry.getValue().piecesReceived()) {
+                                sorted.add(i, entry.getKey());
+                                inserted = true;
+                            }
+                        }
+                        // Collections.sort(sorted);
+                        // Collections.reverse(list);
+                        if (!inserted) {
+                            sorted.add(entry.getKey());
+                        }
+                        if (entry.getValue().isInterested()) {
+                            if (!interested.contains(entry.getKey())) {
+                                interested.add(entry.getKey());
+                            }
+                        } else {
+                            if (interested.contains(entry.getKey())) {
+                                interested.remove(entry.getKey());
+                            }
+                        }
+                    }
+
+                    String preferred = "";
+                    int modifier = 0;
+                    for (int i = 0; i < sorted.size(); i++) {
+                        if (i < numberOfPreferredNeighbors + modifier) {
+                            if (!interested.contains(sorted.get(i))) {
+                                modifier++;
+                            } else {
+                                preferred += sorted.get(i) + ", ";
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+
+                    connectionManager.get(peerId).updatePreferred(preferred.substring(0, preferred.length() - 2));
+
+                    modifier = 0;
+                    for (int i = 0; i < sorted.size(); i++) {
+                        if (i < numberOfPreferredNeighbors + modifier) {
+                            if (!interested.contains(sorted.get(i))) {
+                                modifier++;
+                            } else if (!unchoked.contains(sorted.get(i))) {
+                                unchoked.add(sorted.get(i));
+                                choked.remove(sorted.get(i));
+                                connectionManager.get(sorted.get(i)).sendUnchoke();
+                            }
+                        } else {
+                            if (!choked.contains(sorted.get(i))) {
+                                unchoked.remove(sorted.get(i));
+                                choked.add(sorted.get(i));
+                                connectionManager.get(sorted.get(i)).sendChoke();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (currentTime - previousOptimUnchoke > optimisticUnchokingInterval) {
+                int choice;
+                do {
+                    choice = choked.get(random.nextInt(choked.size()));
+                } while (!interested.contains(choice));
+                connectionManager.get(choice).sendOptimUnchoke();
+                choked.remove(choice);
+                unchoked.add(choice);
+            }
+
+
 
             allPeersHaveFile = true;
             for (HashMap.Entry<Integer, Peer> entry : peerDictionary.entrySet()) {
@@ -121,11 +238,11 @@ class peerProcess {
 
             currentLine = commonBufferedReader.readLine();
             String unchokingIntervalString = currentLine.split(" ")[1];
-            unchokingInterval = Integer.parseInt(unchokingIntervalString);
+            unchokingInterval = Integer.parseInt(unchokingIntervalString) * 1000;
 
             currentLine = commonBufferedReader.readLine();
             String optimisticUnchokingIntervalString = currentLine.split(" ")[1];
-            optimisticUnchokingInterval = Integer.parseInt(optimisticUnchokingIntervalString);
+            optimisticUnchokingInterval = Integer.parseInt(optimisticUnchokingIntervalString) * 1000;
 
             currentLine = commonBufferedReader.readLine();
             fileName = currentLine.split(" ")[1];
@@ -225,6 +342,7 @@ class peerProcess {
 
     private static void terminateThreads() {
         //Log here
+        System.out.println("Terminating ...");
         for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
             entry.getValue().terminate();
         }

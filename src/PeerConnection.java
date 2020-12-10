@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.zip.InflaterOutputStream;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.management.ServiceNotFoundException;
 
@@ -28,8 +29,10 @@ public class PeerConnection implements Runnable {
     BufferedInputStream inputStream;
     BufferedOutputStream outputStream;
     private boolean handshakeReceived = false;
-    private boolean isChoked = false;
+    private boolean isChoked = true;
+    private boolean isInterested = false;
     private volatile boolean running;
+    private int piecesReceived = 0;
 
     public PeerConnection(int id, Socket s) { // for requested connections where destination is known
         connectedPeerId = id;
@@ -46,6 +49,7 @@ public class PeerConnection implements Runnable {
     }
 
     public void terminate() {
+        System.out.println("Terminating thread to peer " + connectedPeerId);
         running = false;
     }
 
@@ -181,6 +185,11 @@ public class PeerConnection implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    public void sendOptimUnchoke() {
+        Logger.write("Peer " + peerProcess.getPeerId() + " has the optimistically unchoked neighbor " + connectedPeerId + ".");
+        sendUnchoke();
     }
 
     public void sendUnchoke() {
@@ -359,11 +368,21 @@ public class PeerConnection implements Runnable {
     }
 
     public void listenForMessages() {
-
         while (running) { // once again, this should probably be a thread
             processMessage();
         }
+    }
 
+    public int piecesReceived() {
+        return piecesReceived;
+    }
+
+    public boolean isInterested() {
+        return isInterested;
+    }
+
+    public void updatePreferred(String preferred) {
+        Logger.write("Peer " + peerProcess.getPeerId() + " has the preferred neighbors " + preferred + ".");
     }
 
     public synchronized void processMessage() { // TODO confirm what "synchronized does"
@@ -387,16 +406,19 @@ public class PeerConnection implements Runnable {
                 Logger.write("Peer " + peerProcess.getPeerId() + " is choked by " + connectedPeerId + ".");
                 break;
             case 1: // unchoke
+                piecesReceived = 0;
                 Logger.write("Peer " + peerProcess.getPeerId() + " is unchoked by " + connectedPeerId + ".");
                 byte[] piece = pickPieceIndex();
                 sendRequest(piece);
                 break;
             case 2: // interested
+                isInterested = true;
                 connectedPeer.becomeInterested();
                 Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘interested’ message from "
                         + connectedPeerId + ".");
                 break;
             case 3: // not interested
+                isInterested = false;
                 connectedPeer.becomeUninterested();
                 Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘not interested’ message from "
                         + connectedPeerId + ".");
@@ -429,6 +451,7 @@ public class PeerConnection implements Runnable {
             case 7: // piece
                 // TODO: first download piece
                 // after download, request another
+                piecesReceived++;
                 piece = pickPieceIndex();
                 sendRequest(piece);
                 break;
