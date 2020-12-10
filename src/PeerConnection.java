@@ -391,7 +391,8 @@ public class PeerConnection implements Runnable {
         System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
 
         // TODO: get the file piece
-        // System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
+        byte[] filePiece = someFunction(pieceIndex);
+        System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
 
         try {
             outputStream.write(pieceMessage);
