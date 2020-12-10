@@ -45,6 +45,10 @@ public class Peer {
         return (hasFile == 1);
     }
 
+    public void setHasFile(int i){
+        hasFile = i;
+    }
+
     public byte[] getBitfield() {
         return bitfield;
     }
