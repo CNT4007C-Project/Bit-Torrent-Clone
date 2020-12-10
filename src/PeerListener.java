@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -6,6 +7,7 @@ public class PeerListener implements Runnable {
     private int connectedPeerId;
     private Peer connectedPeer;
     private PeerConnection connectionObj;
+    private Socket sock;
     private volatile boolean running;
 
     public PeerListener(int id) {
@@ -16,12 +18,19 @@ public class PeerListener implements Runnable {
 
     public void terminate() {
         running = false;
+        try {
+            if (sock != null) {
+                sock.close();
+            }
+        } catch (IOException e) {
+            //Socket forced to close
+        }
     }
 
     // @Override
     public void run() {
         Peer self = peerProcess.getPeerDictionary().get(peerProcess.getPeerId());
-        Socket sock = null;
+        sock = null;
 
         //
         /*
@@ -52,10 +61,13 @@ public class PeerListener implements Runnable {
                 s.start();
             }
 
+        } catch (IOException e) {
+            //Socket forced to close
         } catch (Exception e) {
             // TODO: handle excpetion
             e.printStackTrace();
         }
+        
         connectionObj.terminate();
         
     }

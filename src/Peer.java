@@ -100,7 +100,9 @@ public class Peer {
         // To do: fix this
         boolean complete = true;
         for (int i = 0; i < bitfield.length; i++) {
-            if (bitfield[i] != 1) {
+            if (i == bitfield.length-1) {
+                if (Byte.valueOf(bitfield[i]) > 0)
+            } else if (Byte.valueOf(bitfield[i]) == Byte.MAX_VALUE) {
                 complete = false;
                 break;
             }
