@@ -40,9 +40,9 @@ public class FileManager {
                 return false;
             }
         }
-        if((peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())){ 
+        if(!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())){ 
 
-            //UPDATE PEER CFG INFO HERE
+            peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
             try {
                 for(int i = 0; i < numPieces; i++){
                     byte[] temp = new byte[piecesList.get(i).getPieceSize()];
@@ -69,6 +69,7 @@ public class FileManager {
                     }
                     deletePieces.delete();
                 }
+                Logger.write("Peer " + Integer.toString(peerProcess.getPeerId()) + " has downloaded the complete file.");
 
             } catch (Exception e) {
                 return true; 
