@@ -79,7 +79,7 @@ class peerProcess {
         }
 
         while (!allPeersHaveFile) {
-
+            // System.out.println("start");
             if (peerDictionary.get(peerId).getHasFile()) {
                 first = true;
             }
@@ -207,6 +207,7 @@ class peerProcess {
                     break;
                 }
             }
+            // System.out.println("end");
         }
         terminateThreads();
     }

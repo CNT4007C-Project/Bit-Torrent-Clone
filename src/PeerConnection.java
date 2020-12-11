@@ -417,7 +417,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
 
         // get the file piece
-        System.out.println("LENGTH: " + filePiece.length);
+        // System.out.println("LENGTH: " + filePiece.length);
         System.arraycopy(filePiece, 0, pieceMessage, 9, filePiece.length);
 
         try {
@@ -462,6 +462,7 @@ public class PeerConnection implements Runnable {
             inputStream.read(messageType);
         } catch (IOException e) {
             // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 
