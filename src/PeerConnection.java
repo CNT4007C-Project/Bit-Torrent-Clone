@@ -47,7 +47,7 @@ public class PeerConnection implements Runnable {
     }
 
     public void terminate() {
-        System.out.println("Terminating thread to peer " + connectedPeerId);
+        // System.out.println("Terminating thread to peer " + connectedPeerId);
         running = false;
     }
 
@@ -376,8 +376,8 @@ public class PeerConnection implements Runnable {
 
         // show which pieces ONLY the peer has
         byte[] uniqueToPeer = BitfieldUtility.and(unique, connectedPeer.getBitfield());
-        System.out.print("uniquePeer: ");
-        BitfieldUtility.printBitfield(uniqueToPeer);
+        // System.out.print("uniquePeer: ");
+        // BitfieldUtility.printBitfield(uniqueToPeer);
 
         Vector<Integer> neededPieces = new Vector<Integer>();
 
@@ -389,7 +389,7 @@ public class PeerConnection implements Runnable {
         }
 
         Random random = new Random();
-        System.out.println("needed pieces: " + neededPieces.size());
+        // System.out.println("needed pieces: " + neededPieces.size());
         if (neededPieces.size() != 0) {
             int index = random.nextInt(neededPieces.size());
             int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
@@ -467,8 +467,8 @@ public class PeerConnection implements Runnable {
             inputStream.read(messageType);
         } catch (IOException e) {
             // TODO Auto-generated catch block
-
-            e.printStackTrace();
+            System.out.println("Connection closed by peer");
+            // e.printStackTrace();
         }
 
         int type = messageType[0];
@@ -576,8 +576,8 @@ public class PeerConnection implements Runnable {
                     } else {
                         // after download, request another
                         byte[] p = pickPieceIndex();
-                        System.out.println(
-                                "Got piece " + index + ", sending request for piece " + ByteBuffer.wrap(p).getInt());
+                        //System.out.println(
+                          //      "Got piece " + index + ", sending request for piece " + ByteBuffer.wrap(p).getInt());
 
                         sendRequest(p);
                     }

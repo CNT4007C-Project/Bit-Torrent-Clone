@@ -104,7 +104,7 @@ public class Peer {
         }
         if (complete) {
             hasFile = 1;
-            System.out.println("Peer " + peerId + " has File");
+            //System.out.println("Peer " + peerId + " has File");
         }
 
     }

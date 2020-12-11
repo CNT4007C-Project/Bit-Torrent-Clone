@@ -78,7 +78,6 @@ class peerProcess {
         while (connectionManager.size() == 0) {
         }
 
-        
         while (!allPeersHaveFile) {
             // System.out.println("start");
             if (peerDictionary.get(peerId).getHasFile()) {
@@ -113,14 +112,13 @@ class peerProcess {
                             // choice = (Integer) peers[random.nextInt(peers.length)];
 
                         } while (choice == peerId && !preferredNeighbors.contains(choice));
-                        System.out.println("choice: " + choice);
+                        // System.out.println("choice: " + choice);
                         preferredNeighbors.add(i, choice);
                         iter++;
                     }
                     System.out.println(preferredNeighbors.size());
                     for (int i = 0; i < Math.min(numberOfPreferredNeighbors, interested.size()); i++) {
                         connectionManager.get(preferredNeighbors.get(i)).sendUnchoke();
-                        System.out.println("Send unchoke 122");
                         unchoked.add(preferredNeighbors.get(i));
                         choked.remove(preferredNeighbors.get(i));
                     }
@@ -190,7 +188,6 @@ class peerProcess {
                                 unchoked.add(sorted.get(i));
                                 choked.remove(sorted.get(i));
                                 connectionManager.get(sorted.get(i)).sendUnchoke();
-                                System.out.println("send unchoke 178");
                             }
                             i++;
                         }
@@ -404,6 +401,7 @@ class peerProcess {
             entry.getValue().terminate();
         }
         listenerObj.terminate();
+        System.exit(0);
     }
 
 }

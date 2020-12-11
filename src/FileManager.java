@@ -75,14 +75,14 @@ public class FileManager {
                 Logger.write(
                         "Peer " + Integer.toString(peerProcess.getPeerId()) + " has downloaded the complete file.");
 
-                for (HashMap.Entry<Integer, Peer> entry : peerProcess.getPeerDictionary().entrySet()) {
+                /*for (HashMap.Entry<Integer, Peer> entry : peerProcess.getPeerDictionary().entrySet()) {
                     if (entry.getValue().getHasFile()) {
                         System.out.println(entry.getKey() + " has file");
                     } else {
                         System.out.println(entry.getKey() + " has bitfield: ");
                         BitfieldUtility.printBitfield(entry.getValue().getBitfield());
                     }
-                }
+                }*/
 
             } catch (Exception e) {
                 return true;
