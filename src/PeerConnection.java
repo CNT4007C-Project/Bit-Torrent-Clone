@@ -568,8 +568,9 @@ public class PeerConnection implements Runnable {
                         peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
                     } else {
                         // after download, request another
-                        System.out.println("Got piece, sending request");
                         byte[] p = pickPieceIndex();
+                        System.out.println(
+                                "Got piece " + index + ", sending request for piece " + ByteBuffer.wrap(p).getInt());
 
                         sendRequest(p);
                     }

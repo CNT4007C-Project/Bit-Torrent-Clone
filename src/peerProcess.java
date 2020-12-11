@@ -74,6 +74,10 @@ class peerProcess {
         Random random = new Random();
         ArrayList<Integer> unchoked = new ArrayList<>();
         ArrayList<Integer> choked = new ArrayList<>();
+
+        while (connectionManager.size() == 0) {
+        }
+
         while (!allPeersHaveFile) {
 
             ArrayList<Integer> interested = new ArrayList<>();
@@ -86,7 +90,7 @@ class peerProcess {
 
             long currentTime = System.currentTimeMillis();
             int iter = 0;
-            if (currentTime - previousUnchoke > unchokingInterval && connectionManager.size() != 0) {
+            if (currentTime - previousUnchoke > unchokingInterval) {
                 if (first) {
                     Object[] peers = connectionManager.keySet().toArray();
                     for (Object object : peers) {
@@ -96,7 +100,6 @@ class peerProcess {
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
                         int choice;
                         do {
-                            System.out.println("hmmm");
                             int ind = random.nextInt(peers.length);
                             // System.out.println(Integer.toString(ind));
                             // choice = (Integer) peers[random.nextInt(peers.length)];
