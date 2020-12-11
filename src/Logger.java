@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +18,19 @@ public class Logger {
     private static int peerIdRunning = peerProcess.getPeerId();
 
     private static String fileNamePeer(int peerId) {
-        return "log_peer_" + Integer.toString(peerId) + ".log";
+        try {
+            File peerFolder = new File("Peer_" + peerProcess.getPeerId());
+            if(!peerFolder.exists()){
+                peerFolder.mkdir();
+            }
+            File logFolder = new File("Peer_" + peerProcess.getPeerId() + "/Logs");
+            if(!logFolder.exists()){
+                logFolder.mkdir();
+            }
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+        return "Peer_" + peerProcess.getPeerId() + "/Logs/log_peer_" + Integer.toString(peerId) + ".log";
     }
 
     private static String giveAbsDir(int peerId) {

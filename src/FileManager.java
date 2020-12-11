@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.plaf.basic.BasicTextFieldUI;
 
 public class FileManager {
 
@@ -16,6 +13,16 @@ public class FileManager {
 
     public FileManager() {
         piecesList = new ArrayList<Piece>();
+
+        try {
+            File peerFolder = new File("Peer_" + peerProcess.getPeerId());
+            if(!peerFolder.exists()){
+                peerFolder.mkdir();
+            }
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+
         if (peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile()) { // Init if have the file
             for (int i = 0; i < numPieces; i++) {
                 piecesList.add(new Piece(i, true));
@@ -42,20 +49,20 @@ public class FileManager {
                 return false;
             }
         }
-        if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
+        if ((peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
 
             peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
             try {
                 for (int i = 0; i < numPieces; i++) {
                     byte[] temp = new byte[piecesList.get(i).getPieceSize()];
                     FileInputStream fis = new FileInputStream(new File(
-                            System.getProperty("user.dir") + "/Pieces/" + fileName + "-Piece" + Integer.toString(i)));
+                            System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/Pieces/" + fileName + "-Piece" + Integer.toString(i)));
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     bis.read(temp, 0, temp.length);
                     bis.close();
                     fis.close();
 
-                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/" + fileName, true);
+                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/" + fileName, true);
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
                     bos.write(temp, 0, temp.length);
                     bos.flush();
@@ -63,7 +70,7 @@ public class FileManager {
                     fos.close();
                 }
 
-                File deletePieces = new File(System.getProperty("user.dir") + "/Pieces");
+                File deletePieces = new File(System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/Pieces");
                 if (deletePieces.exists()) {
                     String[] entries = deletePieces.list();
                     for (String s : entries) {
