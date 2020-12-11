@@ -33,6 +33,7 @@ class peerProcess {
     private static String fileName;
     private static int fileSize;
     private static int pieceSize;
+    private static FileManager fileManager;
 
     // PeerInfo.cfg variables
     private static HashMap<Integer, Peer> peerDictionary = new HashMap<>(); // includes info of every peer including
@@ -47,6 +48,7 @@ class peerProcess {
         peerId = Integer.parseInt(args[0]);
         System.out.println("Initializing");
         initialize();
+        fileManager = new FileManager();
         System.out.println("Starting Receiving Connections");
         acceptConnections();
         System.out.println("Starting Sending Connections");
@@ -195,6 +197,10 @@ class peerProcess {
         return peerId;
     }
 
+    public static FileManager getFileManager() {
+        return fileManager;
+    }
+
     public static void startNewConnection(Socket s) {
         // connectionManager.put(i, new PeerConnection(i, toExisting));
     }
@@ -213,6 +219,10 @@ class peerProcess {
 
     public static HashMap<Integer, Peer> getPeerDictionary() {
         return peerDictionary;
+    }
+
+    public static HashMap<Integer, PeerConnection> getConnectionManager() {
+        return connectionManager;
     }
 
     public static byte[] getBitfield() {

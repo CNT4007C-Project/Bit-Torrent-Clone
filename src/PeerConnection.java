@@ -150,6 +150,7 @@ public class PeerConnection implements Runnable {
                 }
 
                 connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
+                peerProcess.getConnectionManager().put(connectedPeerId, this);
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
                 // System.out.println("Handshake received from " + connectedPeerId);
@@ -288,6 +289,31 @@ public class PeerConnection implements Runnable {
         }
     }
 
+    public void sendHave(byte[] pieceIndex) {
+        byte[] haveMessage = new byte[9];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(4);
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, haveMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.put((byte) 4);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, haveMessage, 4, 1);
+        System.arraycopy(pieceIndex, 0, haveMessage, 5, 4);
+
+        try {
+            outputStream.write(haveMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void handleBitfield(byte[] peerBitfield) {
         if (BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), peerBitfield)) {
             sendInterested();
@@ -368,6 +394,40 @@ public class PeerConnection implements Runnable {
         return pIndex;
     }
 
+    public void sendPiece(byte[] pieceIndex) {
+        byte[] pieceMessage = new byte[4 + 1 + 4 + peerProcess.getPieceSize()];
+
+        ByteBuffer lengthBuf = ByteBuffer.allocate(4);
+        lengthBuf.putInt(4 + peerProcess.getPieceSize());
+        byte[] messageLength = lengthBuf.array();
+
+        System.arraycopy(messageLength, 0, pieceMessage, 0, 4);
+
+        ByteBuffer typeBuf = ByteBuffer.allocate(1);
+        typeBuf.put((byte) 7);
+        byte[] messageType = typeBuf.array();
+
+        System.arraycopy(messageType, 0, pieceMessage, 4, 1);
+        System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
+
+        // get the file piece
+        byte[] filePiece = peerProcess.getFileManager().fileToPieces(ByteBuffer.wrap(pieceIndex).getInt());
+        System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
+
+        try {
+            outputStream.write(pieceMessage);
+            outputStream.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void downloadPiece(int index, byte[] piece) {
+        // download the piece
+        peerProcess.getFileManager().piecesToFile(index, piece);
+    }
+
     public void listenForMessages() {
         while (running) { // once again, this should probably be a thread
             processMessage();
@@ -425,8 +485,8 @@ public class PeerConnection implements Runnable {
                         + connectedPeerId + ".");
                 break;
             case 4: // have
-                byte[] pieceIndex = new byte[4];
                 try {
+                    byte[] pieceIndex = new byte[4];
                     inputStream.read(pieceIndex);
                     handlePieceIndex(pieceIndex);
                     Logger.write("Peer " + peerProcess.getPeerId() + " received the ‘have’ message from "
@@ -437,8 +497,8 @@ public class PeerConnection implements Runnable {
                 }
                 break;
             case 5: // bitfield
-                byte[] payload = new byte[length];
                 try {
+                    byte[] payload = new byte[length];
                     inputStream.read(payload);
                     handleBitfield(payload);
                 } catch (IOException e) {
@@ -447,14 +507,64 @@ public class PeerConnection implements Runnable {
                 }
                 break;
             case 6: // request
-                // TODO: send piece
+                try {
+                    byte[] pieceIndex = new byte[4];
+                    inputStream.read(pieceIndex);
+
+                    // TODO: send piece
+                    sendPiece(pieceIndex);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
             case 7: // piece
-                // TODO: first download piece
-                // after download, request another
-                piecesReceived++;
-                piece = pickPieceIndex();
-                sendRequest(piece);
+                try {
+                    byte[] pieceIndex = new byte[4];
+                    inputStream.read(pieceIndex);
+                    int index = ByteBuffer.wrap(pieceIndex).getInt();
+
+                    // first download piece
+                    int pieceSize = ByteBuffer.wrap(messageLength).getInt() - 4;
+                    byte[] filePiece = new byte[pieceSize];
+                    downloadPiece(index, filePiece); // TODO: implement this!!!!!
+
+                    // updating THIS bitfield
+                    BitfieldUtility.setBit(peerProcess.getBitfield(), index, true);
+
+                    // count how many pieces
+                    int numPieces = 0;
+                    for (int i = 0; i < peerProcess.getBitfield().length * 8; i++) {
+                        if (BitfieldUtility.getBit(peerProcess.getBitfield(), i)) {
+                            numPieces++;
+                        }
+                    }
+
+                    Logger.write("Peer " + peerProcess.getPeerId() + " has downloaded the piece " + index + " from "
+                            + connectedPeerId + ". Now the number of pieces it has is " + numPieces + ".");
+
+                    // check neighbors to see if it should still interested
+                    peerProcess.getConnectionManager().forEach((id, peer) -> {
+                        if (!BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), connectedPeer.getBitfield())) {
+                            // if a neighbor is no longer interesting, tell them so on that connection
+                            peer.sendUninterested();
+                        }
+                        peer.sendHave(pieceIndex);
+                    });
+
+                    if (peerProcess.getFileManager().hasAllPieces()) {
+                        // has whole file
+                        peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
+                    }
+
+                    // after download, request another
+                    byte[] p = pickPieceIndex();
+                    sendRequest(p);
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
             default:
                 System.err.println("Message type error!");
