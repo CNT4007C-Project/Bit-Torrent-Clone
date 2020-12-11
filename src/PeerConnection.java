@@ -345,6 +345,7 @@ public class PeerConnection implements Runnable {
 
         // show which pieces ONLY the peer has
         byte[] uniqueToPeer = BitfieldUtility.and(unique, connectedPeer.getBitfield());
+        System.out.println("uniquePeer: " + uniqueToPeer.toString());
 
         Vector<Integer> neededPieces = new Vector<Integer>();
 
@@ -356,6 +357,7 @@ public class PeerConnection implements Runnable {
         }
 
         Random random = new Random();
+        System.out.println(neededPieces.size());
         int index = random.nextInt(neededPieces.size());
 
         int pieceIndexInt = neededPieces.get(index); // choose a random piece to request

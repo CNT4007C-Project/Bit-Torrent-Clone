@@ -84,6 +84,7 @@ class peerProcess {
             }
 
             long currentTime = System.currentTimeMillis();
+            int iter = 0;
             if (currentTime - previousUnchoke > unchokingInterval) {
                 if (first) {
                     Object[] peers = peerDictionary.keySet().toArray();
@@ -92,8 +93,11 @@ class peerProcess {
                         do {
                             choice = (Integer) peers[random.nextInt(peers.length)];
                         } while (choice == peerId);
-                        preferredNeighbors[i] = choice;
+                        System.out.println("choice: " + choice);
+                        preferredNeighbors[iter] = choice;
+                        iter++;
                     }
+                    System.out.println(preferredNeighbors.length);
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
                         connectionManager.get(preferredNeighbors[i]).sendUnchoke();
                     }
@@ -159,16 +163,19 @@ class peerProcess {
                         }
                     }
                 }
+                previousUnchoke = System.currentTimeMillis();
             }
 
             if (currentTime - previousOptimUnchoke > optimisticUnchokingInterval) {
                 int choice;
+                System.out.println("Choked size: " + choked.size());
                 do {
                     choice = choked.get(random.nextInt(choked.size()));
                 } while (!interested.contains(choice));
                 connectionManager.get(choice).sendOptimUnchoke();
                 choked.remove(choice);
                 unchoked.add(choice);
+                previousOptimUnchoke = System.currentTimeMillis();
             }
 
 
