@@ -49,7 +49,7 @@ public class FileManager {
                 return false;
             }
         }
-        if ((peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
+        if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
 
             try {
                 for (int i = 0; i < numPieces; i++) {
