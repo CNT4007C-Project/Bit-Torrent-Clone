@@ -46,9 +46,11 @@ class peerProcess {
     public static void main(String[] args) {
         // Do not log before running the next line
         peerId = Integer.parseInt(args[0]);
+        Logger.write("*** Peer " + peerId + " started ***");
         System.out.println("Initializing");
         initialize();
         fileManager = new FileManager();
+
         System.out.println("Starting Receiving Connections");
         acceptConnections();
         System.out.println("Starting Sending Connections");
@@ -309,6 +311,14 @@ class peerProcess {
             String pieceSizeString = currentLine.split(" ")[1];
             pieceSize = Integer.parseInt(pieceSizeString);
 
+            Logger.write("Reading Common.cfg variables:");
+            Logger.write("\tNumberOfPreferredNeighbors: " + numberOfPreferredNeighborsString);
+            Logger.write("\tUnchokingInterval: " + unchokingIntervalString);
+            Logger.write("\tOptimisticUnchokingInterval: " + optimisticUnchokingIntervalString);
+            Logger.write("\tFileName: " + fileName);
+            Logger.write("\tFileSize: " + fileSizeString);
+            Logger.write("\tPieceSize: " + pieceSizeString);
+
             /* Read PeerInfo.cfg */
             peerInfoBufferedReader = new BufferedReader(new FileReader("./LocalPeerInfo.cfg"));
             /*
@@ -342,6 +352,14 @@ class peerProcess {
                     BitfieldUtility.setBit(bitField, i, true);
                 }
             }
+
+            Logger.write("Reading PeerInfo.cfg information:");
+            Logger.write("\tPeerID\tHostName\tPortNo\tHasFile");
+            //Logger.write(String.format("\t%2s%10s%24s%6s", "PeerID", "HostName", "PortNo", "HasFile"));
+            peerDictionary.forEach((id,peer)->{
+                //Logger.write("\t" +  id + "\t" + peer.getHostName() + "\t" + peer.getPortNumber() + "\t" + peer.getHasFile());
+                Logger.write(String.format("\t%d\t%s\t%d\t%b", id, peer.getHostName(), peer.getPortNumber(), peer.getHasFile()));
+            });
 
             // BitfieldUtility.printBitfield(bitField);
 

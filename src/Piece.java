@@ -24,7 +24,8 @@ public class Piece {
     public void setBytes(byte[] bytes) {
         if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
             try {
-                File directory = new File("Pieces");
+                File directory = new File(
+                        System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/Pieces");
                 if (!directory.exists()) {
                     directory.mkdir();
                 }
@@ -32,9 +33,8 @@ public class Piece {
                 // TODO: handle exception
             }
             try {
-                FileOutputStream fos = new FileOutputStream(
-                        System.getProperty("user.dir") + "/src/peer_" + Integer.toString(peerProcess.getPeerId()) + "/"
-                                + fileName + "-Piece" + Integer.toString(pieceNum));
+                FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/Peer_"
+                        + peerProcess.getPeerId() + "/Pieces/" + fileName + "-Piece" + Integer.toString(pieceNum));
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
                 bos.write(bytes, 0, pieceSize);
                 bos.flush();
@@ -56,9 +56,8 @@ public class Piece {
                                                                                             // pieces
             if (hasBytes) {
                 try {
-                    FileInputStream fis = new FileInputStream(new File(
-                            System.getProperty("user.dir") + "/src/peer_" + Integer.toString(peerProcess.getPeerId())
-                                    + "/" + fileName + "-Piece" + Integer.toString(pieceNum)));
+                    FileInputStream fis = new FileInputStream(new File(System.getProperty("user.dir") + "/Peer_"
+                            + peerProcess.getPeerId() + "/Pieces/" + fileName + "-Piece" + Integer.toString(pieceNum)));
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     bis.read(temp, 0, pieceSize);
                     bis.close();
@@ -73,7 +72,8 @@ public class Piece {
             }
         } else { // has full file
             try {
-                FileInputStream fis = new FileInputStream(new File(System.getProperty("user.dir") + "/" + fileName));
+                FileInputStream fis = new FileInputStream(
+                        new File(System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/" + fileName));
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 bis.skip(pieceNum * pieceSize);
                 bis.read(temp, 0, pieceSize);
