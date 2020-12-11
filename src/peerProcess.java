@@ -167,18 +167,29 @@ class peerProcess {
                     connectionManager.get(peerId).updatePreferred(preferred.substring(0, preferred.length() - 2));
 
                     modifier = 0;
+                    int iterator = 0;
                     for (int i = 0; i < sorted.size(); i++) {
-                        if (i < numberOfPreferredNeighbors + modifier) {
+                        System.out.print(sorted.size() + "=size, curr=" + sorted.get(i) + ": ");
+                        // if (i < numberOfPreferredNeighbors + modifier) {
+                        for (int j = numberOfPreferredNeighbors; j > 0; j--) {
+                            System.out.print(sorted.get(i) + ": ");
                             if (!interested.contains(sorted.get(i))) {
+                                System.out.print(": not interested\n");
                                 modifier++;
                             } else if (!unchoked.contains(sorted.get(i))) {
+                                System.out.print("unchoking\n");
                                 unchoked.add(sorted.get(i));
                                 choked.remove(sorted.get(i));
                                 connectionManager.get(sorted.get(i)).sendUnchoke();
                                 System.out.println("send unchoke 178");
                             }
-                        } else {
+                            i++;
+                        }
+                        System.out.println("i value: " + i);
+                        if (i < sorted.size()) {
+                            System.out.print(sorted.get(i) + ": ");
                             if (!choked.contains(sorted.get(i))) {
+                                System.out.print("is choked\n");
                                 unchoked.remove(sorted.get(i));
                                 choked.add(sorted.get(i));
                                 connectionManager.get(sorted.get(i)).sendChoke();
@@ -197,8 +208,7 @@ class peerProcess {
                     choice = choked.get(random.nextInt(choked.size()));
                 } while (!interested.contains(choice));
                 connectionManager.get(choice).sendOptimUnchoke();
-                System.out.println("send optim unchoke");
-                choked.remove(choice);
+                choked.remove(Integer.valueOf(choice));
                 unchoked.add(choice);
                 previousOptimUnchoke = System.currentTimeMillis();
             }
