@@ -102,7 +102,7 @@ class peerProcess {
                         // Start all peers as choked
                         choked.add((Integer) object);
                     }
-                    for (int i = 0; i < numberOfPreferredNeighbors; i++) {
+                    for (int i = 0; i < Math.min(numberOfPreferredNeighbors, interested.size()); i++) {
                         int choice = 0;
                         do {
                             System.out.println("hmmm");
@@ -117,8 +117,9 @@ class peerProcess {
                         iter++;
                     }
                     System.out.println(preferredNeighbors.size());
-                    for (int i = 0; i < numberOfPreferredNeighbors; i++) {
+                    for (int i = 0; i < Math.min(numberOfPreferredNeighbors, interested.size()); i++) {
                         connectionManager.get(preferredNeighbors.get(i)).sendUnchoke();
+                        System.out.println("Send unchoke 122");
                         unchoked.add(preferredNeighbors.get(i));
                     }
                     first = false;
@@ -174,6 +175,7 @@ class peerProcess {
                                 unchoked.add(sorted.get(i));
                                 choked.remove(sorted.get(i));
                                 connectionManager.get(sorted.get(i)).sendUnchoke();
+                                System.out.println("send unchoke 178");
                             }
                         } else {
                             if (!choked.contains(sorted.get(i))) {
@@ -195,6 +197,7 @@ class peerProcess {
                     choice = choked.get(random.nextInt(choked.size()));
                 } while (!interested.contains(choice));
                 connectionManager.get(choice).sendOptimUnchoke();
+                System.out.println("send optim unchoke");
                 choked.remove(choice);
                 unchoked.add(choice);
                 previousOptimUnchoke = System.currentTimeMillis();

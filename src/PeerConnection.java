@@ -164,6 +164,7 @@ public class PeerConnection implements Runnable {
     }
 
     public void sendChoke() {
+        System.out.println("CHOKE");
         byte[] chokeMessage = new byte[5];
 
         ByteBuffer lengthBuf = ByteBuffer.allocate(4);
@@ -389,14 +390,18 @@ public class PeerConnection implements Runnable {
 
         Random random = new Random();
         System.out.println("needed pieces: " + neededPieces.size());
-        int index = random.nextInt(neededPieces.size());
+        if (neededPieces.size() != 0) {
+            int index = random.nextInt(neededPieces.size());
+            int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
 
-        int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
+            ByteBuffer indexBuf = ByteBuffer.allocate(4);
+            indexBuf.putInt(pieceIndexInt);
+            byte[] pIndex = indexBuf.array();
+            return pIndex;
+        } else {
+            return null;
+        }
 
-        ByteBuffer indexBuf = ByteBuffer.allocate(4);
-        indexBuf.putInt(pieceIndexInt);
-        byte[] pIndex = indexBuf.array();
-        return pIndex;
     }
 
     public void sendPiece(byte[] pieceIndex) {
@@ -479,8 +484,9 @@ public class PeerConnection implements Runnable {
                 if (!peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile()) {
                     System.out.println("Got unchoked, sending request");
                     byte[] piece = pickPieceIndex();
-
-                    sendRequest(piece);
+                    if (piece != null) {
+                        sendRequest(piece);
+                    }
                 }
                 break;
             case 2: // interested
