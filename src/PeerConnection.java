@@ -149,7 +149,9 @@ public class PeerConnection implements Runnable {
                 }
 
                 connectedPeer = peerProcess.getPeerDictionary().get(connectedPeerId);
+
                 peerProcess.getConnectionManager().put(connectedPeerId, this);
+
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
                 // System.out.println("Handshake received from " + connectedPeerId);
@@ -279,6 +281,8 @@ public class PeerConnection implements Runnable {
 
         System.arraycopy(messageType, 0, requestMessage, 4, 1);
         System.arraycopy(pieceIndex, 0, requestMessage, 5, 4);
+
+        System.out.println("sending request to " + connectedPeerId);
 
         try {
             outputStream.write(requestMessage);
@@ -472,8 +476,9 @@ public class PeerConnection implements Runnable {
                 piecesReceived = 0;
                 Logger.write("Peer " + peerProcess.getPeerId() + " is unchoked by " + connectedPeerId + ".");
                 if (!peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile()) {
-                    byte[] piece = pickPieceIndex();
                     System.out.println("Got unchoked, sending request");
+                    byte[] piece = pickPieceIndex();
+
                     sendRequest(piece);
                 }
                 break;
@@ -549,6 +554,7 @@ public class PeerConnection implements Runnable {
                             + connectedPeerId + ". Now the number of pieces it has is " + numPieces + ".");
 
                     // check neighbors to see if it should still interested
+
                     peerProcess.getConnectionManager().forEach((id, peer) -> {
                         if (!BitfieldUtility.hasNeededPiece(peerProcess.getBitfield(), connectedPeer.getBitfield())) {
                             // if a neighbor is no longer interesting, tell them so on that connection
@@ -562,8 +568,9 @@ public class PeerConnection implements Runnable {
                         peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
                     } else {
                         // after download, request another
-                        byte[] p = pickPieceIndex();
                         System.out.println("Got piece, sending request");
+                        byte[] p = pickPieceIndex();
+
                         sendRequest(p);
                     }
 

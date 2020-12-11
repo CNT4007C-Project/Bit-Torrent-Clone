@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Random;
 
 // this process should take in the peerID as an argument and run the peer process
@@ -39,7 +40,7 @@ class peerProcess {
                                                                             // THIS one
 
     private static byte[] bitField;
-    private static HashMap<Integer, PeerConnection> connectionManager = new HashMap<>();
+    private static ConcurrentHashMap<Integer, PeerConnection> connectionManager = new ConcurrentHashMap<>();
     private static PeerListener listenerObj;
 
     public static void main(String[] args) {
@@ -76,8 +77,8 @@ class peerProcess {
         while (!allPeersHaveFile) {
 
             ArrayList<Integer> interested = new ArrayList<>();
-            HashMap<Integer, PeerConnection> copy = new HashMap<Integer, PeerConnection>(connectionManager);
-            for (HashMap.Entry<Integer, PeerConnection> entry : copy.entrySet()) {
+
+            for (ConcurrentHashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
                 if (entry.getValue().isInterested()) {
                     interested.add(entry.getKey());
                 }
@@ -113,7 +114,7 @@ class peerProcess {
                     first = false;
                 } else {
                     ArrayList<Integer> sorted = new ArrayList<>();
-                    for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+                    for (ConcurrentHashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
                         downloadRate.put(entry.getKey(), entry.getValue().piecesReceived());
                         boolean inserted = false;
                         for (int i = 0; i < sorted.size(); i++) {
@@ -228,7 +229,7 @@ class peerProcess {
         return peerDictionary;
     }
 
-    public static HashMap<Integer, PeerConnection> getConnectionManager() {
+    public static ConcurrentHashMap<Integer, PeerConnection> getConnectionManager() {
         return connectionManager;
     }
 
@@ -366,7 +367,7 @@ class peerProcess {
     private static void terminateThreads() {
         // Log here
         System.out.println("Terminating ...");
-        for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+        for (ConcurrentHashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
             entry.getValue().terminate();
         }
         listenerObj.terminate();
