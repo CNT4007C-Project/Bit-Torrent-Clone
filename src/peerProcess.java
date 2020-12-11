@@ -107,7 +107,7 @@ class peerProcess {
                     for (int i = 0; i < Math.min(numberOfPreferredNeighbors, interested.size()); i++) {
                         int choice = 0;
                         do {
-                            System.out.println("hmmm");
+
                             int ind = random.nextInt(interested.size());
                             choice = interested.get(ind);
                             // System.out.println(Integer.toString(ind));
@@ -354,11 +354,14 @@ class peerProcess {
             }
 
             Logger.write("Reading PeerInfo.cfg information:");
-            Logger.write("\tPeerID\tHostName\tPortNo\tHasFile");
-            //Logger.write(String.format("\t%2s%10s%24s%6s", "PeerID", "HostName", "PortNo", "HasFile"));
-            peerDictionary.forEach((id,peer)->{
-                //Logger.write("\t" +  id + "\t" + peer.getHostName() + "\t" + peer.getPortNumber() + "\t" + peer.getHasFile());
-                Logger.write(String.format("\t%d\t%s\t%d\t%b", id, peer.getHostName(), peer.getPortNumber(), peer.getHasFile()));
+            Logger.write("\tPeerID\tHostName\tPortNo\tHasFile\tBitfield");
+            // Logger.write(String.format("\t%2s%10s%24s%6s", "PeerID", "HostName",
+            // "PortNo", "HasFile"));
+            peerDictionary.forEach((id, peer) -> {
+                // Logger.write("\t" + id + "\t" + peer.getHostName() + "\t" +
+                // peer.getPortNumber() + "\t" + peer.getHasFile());
+                Logger.write(String.format("\t%d\t%s\t%d\t%b\t%s", id, peer.getHostName(), peer.getPortNumber(),
+                        peer.getHasFile(), BitfieldUtility.getBitfieldString(peer.getBitfield())));
             });
 
             // BitfieldUtility.printBitfield(bitField);

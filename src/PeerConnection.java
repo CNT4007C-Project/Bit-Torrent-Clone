@@ -154,7 +154,7 @@ public class PeerConnection implements Runnable {
 
                 handshakeReceived = true; // does there need to be some sort of ack as well? Or does that happen
                                           // automatically?
-                // System.out.println("Handshake received from " + connectedPeerId);
+                System.out.println("Handshake received from " + connectedPeerId);
             }
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
@@ -164,7 +164,6 @@ public class PeerConnection implements Runnable {
     }
 
     public void sendChoke() {
-        System.out.println("CHOKE");
         byte[] chokeMessage = new byte[5];
 
         ByteBuffer lengthBuf = ByteBuffer.allocate(4);
@@ -283,7 +282,7 @@ public class PeerConnection implements Runnable {
         System.arraycopy(messageType, 0, requestMessage, 4, 1);
         System.arraycopy(pieceIndex, 0, requestMessage, 5, 4);
 
-        System.out.println("sending request to " + connectedPeerId);
+        // System.out.println("sending request to " + connectedPeerId);
 
         try {
             outputStream.write(requestMessage);
@@ -576,8 +575,9 @@ public class PeerConnection implements Runnable {
                     } else {
                         // after download, request another
                         byte[] p = pickPieceIndex();
-                        //System.out.println(
-                          //      "Got piece " + index + ", sending request for piece " + ByteBuffer.wrap(p).getInt());
+                        // System.out.println(
+                        // "Got piece " + index + ", sending request for piece " +
+                        // ByteBuffer.wrap(p).getInt());
 
                         sendRequest(p);
                     }

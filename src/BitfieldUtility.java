@@ -49,6 +49,18 @@ public class BitfieldUtility {
         System.out.println("");
     }
 
+    public static String getBitfieldString(byte[] b) {
+        String s = "";
+        for (int i = 0; i < b.length * 8; i++) {
+            if (getBit(b, i)) {
+                s = s + "1";
+            } else {
+                s = s + "0";
+            }
+        }
+        return s;
+    }
+
     public static boolean hasNeededPiece(byte[] ourBitfield, byte[] peerBitfield) {
         // tells us if the peerBitfield has a piece our bitfield does not
         for (int i = 0; i < peerBitfield.length * 8; i++) {
