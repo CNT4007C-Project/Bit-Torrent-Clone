@@ -89,7 +89,11 @@ class peerProcess {
             int iter = 0;
             if (currentTime - previousUnchoke > unchokingInterval) {
                 if (first) {
-                    Object[] peers = peerDictionary.keySet().toArray();
+                    Object[] peers = connectionManager.keySet().toArray();
+                    for (Object object : peers) {
+                        // Start all peers as choked
+                        choked.add((Integer)object);
+                    }
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
                         int choice;
                         do {
@@ -102,6 +106,7 @@ class peerProcess {
                     System.out.println(preferredNeighbors.length);
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
                         connectionManager.get(preferredNeighbors[i]).sendUnchoke();
+                        unchoked.add(preferredNeighbors[i]);
                     }
                 } else {
                     ArrayList<Integer> sorted = new ArrayList<>();
