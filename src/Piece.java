@@ -75,7 +75,7 @@ public class Piece {
                 FileInputStream fis = new FileInputStream(
                         new File(System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/" + fileName));
                 BufferedInputStream bis = new BufferedInputStream(fis);
-                bis.skip(pieceNum * pieceSize);
+                bis.skip(pieceNum * peerProcess.getPieceSize());
                 bis.read(temp, 0, pieceSize);
                 bis.close();
                 fis.close();
