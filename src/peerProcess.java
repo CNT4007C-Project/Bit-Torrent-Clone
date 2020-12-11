@@ -13,7 +13,6 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Random;
 
-
 // this process should take in the peerID as an argument and run the peer process
 
 // TODO figure out if subdirectories should be created at runtime or manually beforehand
@@ -53,20 +52,18 @@ class peerProcess {
         acceptConnections();
         System.out.println("Starting Sending Connections");
         requestConnections();
-        
+
         boolean allPeersHaveFile = false;
         long previousUnchoke = System.currentTimeMillis();
         long previousOptimUnchoke = System.currentTimeMillis();
-        
+
         /*
-        Peer peer = peerDictionary.get(peerId);
-        for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
-            // Clients start by choked and not interested
-            entry.getValue().sendChoke();
-        }
-        // Listener should choke new connections automatically
-        // Should be fine not to choke anything at beginning
-        */
+         * Peer peer = peerDictionary.get(peerId); for (HashMap.Entry<Integer,
+         * PeerConnection> entry : connectionManager.entrySet()) { // Clients start by
+         * choked and not interested entry.getValue().sendChoke(); } // Listener should
+         * choke new connections automatically // Should be fine not to choke anything
+         * at beginning
+         */
 
         boolean first = true;
         // ASSUMING THAT connectionManager has all peers
@@ -76,10 +73,11 @@ class peerProcess {
         Random random = new Random();
         ArrayList<Integer> unchoked = new ArrayList<>();
         ArrayList<Integer> choked = new ArrayList<>();
-        while(!allPeersHaveFile) {
-            
+        while (!allPeersHaveFile) {
+
             ArrayList<Integer> interested = new ArrayList<>();
-            for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
+            HashMap<Integer, PeerConnection> copy = new HashMap<Integer, PeerConnection>(connectionManager);
+            for (HashMap.Entry<Integer, PeerConnection> entry : copy.entrySet()) {
                 if (entry.getValue().isInterested()) {
                     interested.add(entry.getKey());
                 }
@@ -87,13 +85,18 @@ class peerProcess {
 
             long currentTime = System.currentTimeMillis();
             int iter = 0;
-            if (currentTime - previousUnchoke > unchokingInterval) {
+            if (currentTime - previousUnchoke > unchokingInterval && connectionManager.size() != 0) {
                 if (first) {
-                    Object[] peers = peerDictionary.keySet().toArray();
+                    // Object[] peers = peerDictionary.keySet().toArray();
+                    Object[] peers = connectionManager.keySet().toArray();
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
                         int choice;
                         do {
-                            choice = (Integer) peers[random.nextInt(peers.length)];
+                            System.out.println("hmmm");
+                            int ind = random.nextInt(peers.length);
+                            // System.out.println(Integer.toString(ind));
+                            // choice = (Integer) peers[random.nextInt(peers.length)];
+                            choice = (Integer) peers[ind];
                         } while (choice == peerId);
                         System.out.println("choice: " + choice);
                         preferredNeighbors[iter] = choice;
@@ -168,7 +171,8 @@ class peerProcess {
                 previousUnchoke = System.currentTimeMillis();
             }
 
-            if (currentTime - previousOptimUnchoke > optimisticUnchokingInterval) {
+            if (currentTime - previousOptimUnchoke > optimisticUnchokingInterval && connectionManager.size() > 1
+                    && choked.size() != 0) {
                 int choice;
                 System.out.println("Choked size: " + choked.size());
                 do {
@@ -179,8 +183,6 @@ class peerProcess {
                 unchoked.add(choice);
                 previousOptimUnchoke = System.currentTimeMillis();
             }
-
-
 
             allPeersHaveFile = true;
             for (HashMap.Entry<Integer, Peer> entry : peerDictionary.entrySet()) {
@@ -281,7 +283,7 @@ class peerProcess {
             String[] strings = null;
 
             currentLine = peerInfoBufferedReader.readLine();
-            System.out.println(currentLine);
+            // System.out.println(currentLine);
             while (currentLine != null) {
                 strings = currentLine.split(" ");
                 Peer peer = new Peer(Integer.parseInt(strings[0]), strings[1], Integer.parseInt(strings[2]),
@@ -357,13 +359,12 @@ class peerProcess {
     }
 
     private static void terminateThreads() {
-        //Log here
+        // Log here
         System.out.println("Terminating ...");
         for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
             entry.getValue().terminate();
         }
         listenerObj.terminate();
     }
-
 
 }

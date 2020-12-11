@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import javax.management.ServiceNotFoundException;
 
-
 import java.nio.*;
 
 public class PeerConnection implements Runnable {
@@ -188,7 +187,8 @@ public class PeerConnection implements Runnable {
     }
 
     public void sendOptimUnchoke() {
-        Logger.write("Peer " + peerProcess.getPeerId() + " has the optimistically unchoked neighbor " + connectedPeerId + ".");
+        Logger.write("Peer " + peerProcess.getPeerId() + " has the optimistically unchoked neighbor " + connectedPeerId
+                + ".");
         sendUnchoke();
     }
 
@@ -371,7 +371,8 @@ public class PeerConnection implements Runnable {
 
         // show which pieces ONLY the peer has
         byte[] uniqueToPeer = BitfieldUtility.and(unique, connectedPeer.getBitfield());
-        System.out.println("uniquePeer: " + uniqueToPeer.toString());
+        System.out.print("uniquePeer: ");
+        BitfieldUtility.printBitfield(uniqueToPeer);
 
         Vector<Integer> neededPieces = new Vector<Integer>();
 
@@ -383,7 +384,7 @@ public class PeerConnection implements Runnable {
         }
 
         Random random = new Random();
-        System.out.println(neededPieces.size());
+        System.out.println("needed pieces: " + neededPieces.size());
         int index = random.nextInt(neededPieces.size());
 
         int pieceIndexInt = neededPieces.get(index); // choose a random piece to request
@@ -395,10 +396,11 @@ public class PeerConnection implements Runnable {
     }
 
     public void sendPiece(byte[] pieceIndex) {
-        byte[] pieceMessage = new byte[4 + 1 + 4 + peerProcess.getPieceSize()];
+        byte[] filePiece = peerProcess.getFileManager().fileToPieces(ByteBuffer.wrap(pieceIndex).getInt());
+        byte[] pieceMessage = new byte[4 + 1 + 4 + filePiece.length];
 
         ByteBuffer lengthBuf = ByteBuffer.allocate(4);
-        lengthBuf.putInt(4 + peerProcess.getPieceSize());
+        lengthBuf.putInt(4 + filePiece.length);
         byte[] messageLength = lengthBuf.array();
 
         System.arraycopy(messageLength, 0, pieceMessage, 0, 4);
@@ -411,8 +413,8 @@ public class PeerConnection implements Runnable {
         System.arraycopy(pieceIndex, 0, pieceMessage, 5, 4);
 
         // get the file piece
-        byte[] filePiece = peerProcess.getFileManager().fileToPieces(ByteBuffer.wrap(pieceIndex).getInt());
-        System.arraycopy(filePiece, 0, pieceMessage, 9, peerProcess.getPieceSize());
+        System.out.println("LENGTH: " + filePiece.length);
+        System.arraycopy(filePiece, 0, pieceMessage, 9, filePiece.length);
 
         try {
             outputStream.write(pieceMessage);
@@ -469,8 +471,11 @@ public class PeerConnection implements Runnable {
             case 1: // unchoke
                 piecesReceived = 0;
                 Logger.write("Peer " + peerProcess.getPeerId() + " is unchoked by " + connectedPeerId + ".");
-                byte[] piece = pickPieceIndex();
-                sendRequest(piece);
+                if (!peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile()) {
+                    byte[] piece = pickPieceIndex();
+                    System.out.println("Got unchoked, sending request");
+                    sendRequest(piece);
+                }
                 break;
             case 2: // interested
                 isInterested = true;
@@ -527,8 +532,8 @@ public class PeerConnection implements Runnable {
                     // first download piece
                     int pieceSize = ByteBuffer.wrap(messageLength).getInt() - 4;
                     byte[] filePiece = new byte[pieceSize];
-                    downloadPiece(index, filePiece); // TODO: implement this!!!!!
-
+                    inputStream.read(filePiece);
+                    downloadPiece(index, filePiece);
                     // updating THIS bitfield
                     BitfieldUtility.setBit(peerProcess.getBitfield(), index, true);
 
@@ -555,11 +560,12 @@ public class PeerConnection implements Runnable {
                     if (peerProcess.getFileManager().hasAllPieces()) {
                         // has whole file
                         peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
+                    } else {
+                        // after download, request another
+                        byte[] p = pickPieceIndex();
+                        System.out.println("Got piece, sending request");
+                        sendRequest(p);
                     }
-
-                    // after download, request another
-                    byte[] p = pickPieceIndex();
-                    sendRequest(p);
 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -567,7 +573,9 @@ public class PeerConnection implements Runnable {
                 }
                 break;
             default:
+                Logger.write("MESSAGE TYPE ERROR");
                 System.err.println("Message type error!");
+                System.out.println("REC TYPE: " + type);
 
         }
 
