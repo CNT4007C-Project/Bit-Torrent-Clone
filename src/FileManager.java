@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.swing.plaf.basic.BasicTextFieldUI;
 
 public class FileManager {
 
@@ -71,6 +74,15 @@ public class FileManager {
                 }
                 Logger.write(
                         "Peer " + Integer.toString(peerProcess.getPeerId()) + " has downloaded the complete file.");
+
+                for (HashMap.Entry<Integer, Peer> entry : peerProcess.getPeerDictionary().entrySet()) {
+                    if (entry.getValue().getHasFile()) {
+                        System.out.println(entry.getKey() + " has file");
+                    } else {
+                        System.out.println(entry.getKey() + " has bitfield: ");
+                        BitfieldUtility.printBitfield(entry.getValue().getBitfield());
+                    }
+                }
 
             } catch (Exception e) {
                 return true;

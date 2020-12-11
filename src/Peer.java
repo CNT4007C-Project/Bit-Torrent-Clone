@@ -45,7 +45,7 @@ public class Peer {
         return (hasFile == 1);
     }
 
-    public void setHasFile(int i){
+    public void setHasFile(int i) {
         hasFile = i;
     }
 
@@ -91,19 +91,20 @@ public class Peer {
     private void fileStatusCheck() {
         // To do: fix this
         boolean complete = true;
-        for (int i = 0; i < bitfield.length; i++) {
-            if (i == bitfield.length-1) {
-                if (Byte.valueOf(bitfield[i]) != Byte.MAX_VALUE) {
-                    complete = false;
-                    break;
-                }
-            } else if (Byte.valueOf(bitfield[i]) != Byte.MAX_VALUE) {
+        /*
+         * for (int i = 0; i < bitfield.length; i++) { if (i == bitfield.length-1) { if
+         * (Byte.valueOf(bitfield[i]) != Byte.MAX_VALUE) { complete = false; break; } }
+         * else if (Byte.valueOf(bitfield[i]) != Byte.MAX_VALUE) { complete = false;
+         * break; } }
+         */
+        for (int i = 0; i < peerProcess.getPieces(); i++) {
+            if (!BitfieldUtility.getBit(bitfield, i)) {
                 complete = false;
-                break;
             }
         }
         if (complete) {
             hasFile = 1;
+            System.out.println("Peer " + peerId + " has File");
         }
 
     }
