@@ -519,6 +519,11 @@ public class PeerConnection implements Runnable {
                         peer.sendHave(pieceIndex);
                     });
 
+                    if (peerProcess.getFileManager().hasAllPieces()) {
+                        // has whole file
+                        peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
+                    }
+
                     // after download, request another
                     byte[] p = pickPieceIndex();
                     sendRequest(p);

@@ -6,8 +6,6 @@ import java.net.UnknownHostException;
 import java.util.BitSet;
 import java.util.HashMap;
 
-import com.apple.eio.FileManager;
-
 // this process should take in the peerID as an argument and run the peer process
 
 // TODO figure out if subdirectories should be created at runtime or manually beforehand
