@@ -78,6 +78,7 @@ class peerProcess {
         while (connectionManager.size() == 0) {
         }
 
+        
         while (!allPeersHaveFile) {
             // System.out.println("start");
             if (peerDictionary.get(peerId).getHasFile()) {
