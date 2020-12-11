@@ -282,7 +282,7 @@ class peerProcess {
         try {
 
             /* Read Common.cfg */
-            commonBufferedReader = new BufferedReader(new FileReader("./Common.cfg"));
+            commonBufferedReader = new BufferedReader(new FileReader("./Common3.cfg"));
 
             // TODO this could probably be a loop that automatically names the variables in
             // a HashMap;\

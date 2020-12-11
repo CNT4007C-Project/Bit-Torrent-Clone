@@ -485,6 +485,8 @@ public class PeerConnection implements Runnable {
                     byte[] piece = pickPieceIndex();
                     if (piece != null) {
                         sendRequest(piece);
+                    } else {
+                        sendUninterested();
                     }
                 }
                 break;
@@ -578,9 +580,11 @@ public class PeerConnection implements Runnable {
                         // System.out.println(
                         // "Got piece " + index + ", sending request for piece " +
                         // ByteBuffer.wrap(p).getInt());
-                        
-                        if(p != null)
+                        if (p != null) {
                             sendRequest(p);
+                        } else {
+                            sendUninterested();
+                        }
                     }
 
                 } catch (IOException e) {
