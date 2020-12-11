@@ -108,6 +108,7 @@ class peerProcess {
                         connectionManager.get(preferredNeighbors[i]).sendUnchoke();
                         unchoked.add(preferredNeighbors[i]);
                     }
+                    first = false;
                 } else {
                     ArrayList<Integer> sorted = new ArrayList<>();
                     for (HashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
