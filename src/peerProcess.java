@@ -121,6 +121,14 @@ class peerProcess {
                         connectionManager.get(preferredNeighbors.get(i)).sendUnchoke();
                         System.out.println("Send unchoke 122");
                         unchoked.add(preferredNeighbors.get(i));
+                        choked.remove(preferredNeighbors.get(i));
+                    }
+
+                    for (Object object : peers) {
+                        if (choked.contains((Integer) object) && unchoked.contains((Integer) object)) {
+                            unchoked.remove((Integer) object);
+                            connectionManager.get((Integer) object).sendChoke();
+                        }
                     }
                     first = false;
                 } else {
