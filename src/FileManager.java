@@ -44,18 +44,19 @@ public class FileManager {
         }
         if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
 
-            peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
             try {
                 for (int i = 0; i < numPieces; i++) {
                     byte[] temp = new byte[piecesList.get(i).getPieceSize()];
                     FileInputStream fis = new FileInputStream(new File(
-                            System.getProperty("user.dir") + "/Pieces/" + fileName + "-Piece" + Integer.toString(i)));
+                            System.getProperty("user.dir") + "/src/peer_" + Integer.toString(peerProcess.getPeerId())
+                                    + "/" + fileName + "-Piece" + Integer.toString(i)));
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     bis.read(temp, 0, temp.length);
                     bis.close();
                     fis.close();
 
-                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/" + fileName, true);
+                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/peer_"
+                            + Integer.toString(peerProcess.getPeerId()) + "/" + fileName, true);
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
                     bos.write(temp, 0, temp.length);
                     bos.flush();
@@ -75,14 +76,16 @@ public class FileManager {
                 Logger.write(
                         "Peer " + Integer.toString(peerProcess.getPeerId()) + " has downloaded the complete file.");
 
-                /*for (HashMap.Entry<Integer, Peer> entry : peerProcess.getPeerDictionary().entrySet()) {
-                    if (entry.getValue().getHasFile()) {
-                        System.out.println(entry.getKey() + " has file");
-                    } else {
-                        System.out.println(entry.getKey() + " has bitfield: ");
-                        BitfieldUtility.printBitfield(entry.getValue().getBitfield());
-                    }
-                }*/
+                peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).setHasFile(1);
+
+                /*
+                 * for (HashMap.Entry<Integer, Peer> entry :
+                 * peerProcess.getPeerDictionary().entrySet()) { if
+                 * (entry.getValue().getHasFile()) { System.out.println(entry.getKey() +
+                 * " has file"); } else { System.out.println(entry.getKey() +
+                 * " has bitfield: ");
+                 * BitfieldUtility.printBitfield(entry.getValue().getBitfield()); } }
+                 */
 
             } catch (Exception e) {
                 return true;

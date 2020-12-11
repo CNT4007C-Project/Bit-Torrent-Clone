@@ -10,80 +10,85 @@ public class Piece {
     private boolean hasBytes;
     private String fileName = peerProcess.getFileName();
     private int pieceNum;
-    
-    public Piece(int i, boolean b){
+
+    public Piece(int i, boolean b) {
         pieceNum = i;
         hasBytes = b;
-        pieceSize = Math.min(peerProcess.getPieceSize(), peerProcess.getFileSize()-i*peerProcess.getPieceSize());
+        pieceSize = Math.min(peerProcess.getPieceSize(), peerProcess.getFileSize() - i * peerProcess.getPieceSize());
     }
-    public boolean getHasBytes(int i){
+
+    public boolean getHasBytes(int i) {
         return hasBytes;
     }
-    public void setBytes(byte[] bytes){
-        if(!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())){ 
+
+    public void setBytes(byte[] bytes) {
+        if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
             try {
                 File directory = new File("Pieces");
-                if(!directory.exists()){
+                if (!directory.exists()) {
                     directory.mkdir();
                 }
             } catch (Exception e) {
-                //TODO: handle exception
+                // TODO: handle exception
             }
             try {
-                FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/Pieces/" + fileName + "-Piece" + Integer.toString(pieceNum));
+                FileOutputStream fos = new FileOutputStream(
+                        System.getProperty("user.dir") + "/src/peer_" + Integer.toString(peerProcess.getPeerId()) + "/"
+                                + fileName + "-Piece" + Integer.toString(pieceNum));
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
-                bos.write(bytes,0,pieceSize);
+                bos.write(bytes, 0, pieceSize);
                 bos.flush();
                 bos.close();
                 fos.close();
                 hasBytes = true;
             } catch (Exception e) {
-                //TODO: handle exception
+                // TODO: handle exception
             }
             hasBytes = true;
-        }
-        else{
-            System.out.println("Peer already has full file. No need to set bytes.");
+        } else {
+            // System.out.println("Peer already has full file. No need to set bytes.");
         }
     }
-    
-    public byte[] getBytes(){
+
+    public byte[] getBytes() {
         byte[] temp = new byte[pieceSize];
-        if(!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())){ //Doesn't have file but has pieces
-            if(hasBytes){
+        if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) { // Doesn't have file but has
+                                                                                            // pieces
+            if (hasBytes) {
                 try {
-                    FileInputStream fis = new FileInputStream(new File(System.getProperty("user.dir") + "/Pieces/" + fileName + "-Piece" + Integer.toString(pieceNum)));
+                    FileInputStream fis = new FileInputStream(new File(
+                            System.getProperty("user.dir") + "/src/peer_" + Integer.toString(peerProcess.getPeerId())
+                                    + "/" + fileName + "-Piece" + Integer.toString(pieceNum)));
                     BufferedInputStream bis = new BufferedInputStream(fis);
-                    bis.read(temp,0,pieceSize);
+                    bis.read(temp, 0, pieceSize);
                     bis.close();
                     fis.close();
                     return temp;
                 } catch (Exception e) {
                     return null;
-                    //TODO: handle exception
+                    // TODO: handle exception
                 }
-            }
-            else{
+            } else {
                 return null;
             }
-        }
-        else{ //has full file
+        } else { // has full file
             try {
                 FileInputStream fis = new FileInputStream(new File(System.getProperty("user.dir") + "/" + fileName));
                 BufferedInputStream bis = new BufferedInputStream(fis);
-                bis.skip(pieceNum*pieceSize);
-                bis.read(temp,0, pieceSize);
+                bis.skip(pieceNum * pieceSize);
+                bis.read(temp, 0, pieceSize);
                 bis.close();
                 fis.close();
                 return temp;
             } catch (Exception e) {
                 System.out.println(e);
                 return null;
-                //TODO: handle exception
+                // TODO: handle exception
             }
         }
     }
-    public int getPieceSize(){
+
+    public int getPieceSize() {
         return pieceSize;
     }
 }
