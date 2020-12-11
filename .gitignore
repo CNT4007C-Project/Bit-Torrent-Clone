@@ -1,6 +1,5 @@
 .vscode
 .idea
-bin
 *.class
 *.log
 *.jpg
