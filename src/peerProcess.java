@@ -69,7 +69,7 @@ class peerProcess {
         boolean first = true;
         // ASSUMING THAT connectionManager has all peers
 
-        Integer[] preferredNeighbors = new Integer[numberOfPreferredNeighbors];
+        ArrayList<Integer> preferredNeighbors = new ArrayList<>();
         HashMap<Integer, Integer> downloadRate = new HashMap<>();
         Random random = new Random();
         ArrayList<Integer> unchoked = new ArrayList<>();
@@ -90,7 +90,7 @@ class peerProcess {
 
             long currentTime = System.currentTimeMillis();
             int iter = 0;
-            if (currentTime - previousUnchoke > unchokingInterval && connectionManager.size() != 0) {
+            if (currentTime - previousUnchoke > unchokingInterval && connectionManager.size() != 0 && interested.size() != 0) {
                 if (first) {
                     Object[] peers = connectionManager.keySet().toArray();
                     for (Object object : peers) {
@@ -98,22 +98,23 @@ class peerProcess {
                         choked.add((Integer) object);
                     }
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
-                        int choice;
+                        int choice = 0;
                         do {
                             System.out.println("hmmm");
                             int ind = random.nextInt(interested.size());
+                            choice = interested.get(ind);
                             // System.out.println(Integer.toString(ind));
                             // choice = (Integer) peers[random.nextInt(peers.length)];
-                            choice = interested.get(ind);
-                        } while (choice == peerId);
+                            
+                        } while (choice == peerId && !preferredNeighbors.contains(choice));
                         System.out.println("choice: " + choice);
-                        preferredNeighbors[iter] = choice;
+                        preferredNeighbors.add(i, choice);
                         iter++;
                     }
-                    System.out.println(preferredNeighbors.length);
+                    System.out.println(preferredNeighbors.size());
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
-                        connectionManager.get(preferredNeighbors[i]).sendUnchoke();
-                        unchoked.add(preferredNeighbors[i]);
+                        connectionManager.get(preferredNeighbors.get(i)).sendUnchoke();
+                        unchoked.add(preferredNeighbors.get(i));
                     }
                     first = false;
                 } else {
