@@ -80,6 +80,10 @@ class peerProcess {
 
         while (!allPeersHaveFile) {
 
+            if (peerDictionary.get(peerId).getHasFile()) {
+                first = true;
+            }
+
             ArrayList<Integer> interested = new ArrayList<>();
 
             for (ConcurrentHashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
@@ -100,10 +104,11 @@ class peerProcess {
                     for (int i = 0; i < numberOfPreferredNeighbors; i++) {
                         int choice;
                         do {
-                            int ind = random.nextInt(peers.length);
+                            System.out.println("hmmm");
+                            int ind = random.nextInt(interested.size());
                             // System.out.println(Integer.toString(ind));
                             // choice = (Integer) peers[random.nextInt(peers.length)];
-                            choice = (Integer) peers[ind];
+                            choice = interested.get(ind);
                         } while (choice == peerId);
                         System.out.println("choice: " + choice);
                         preferredNeighbors[iter] = choice;
