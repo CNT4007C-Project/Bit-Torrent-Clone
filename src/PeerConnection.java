@@ -578,8 +578,9 @@ public class PeerConnection implements Runnable {
                         // System.out.println(
                         // "Got piece " + index + ", sending request for piece " +
                         // ByteBuffer.wrap(p).getInt());
-
-                        sendRequest(p);
+                        
+                        if(p != null)
+                            sendRequest(p);
                     }
 
                 } catch (IOException e) {
