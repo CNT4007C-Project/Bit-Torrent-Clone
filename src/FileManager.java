@@ -49,8 +49,8 @@ public class FileManager {
                 return false;
             }
         }
-        if (!(peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile())) {
-
+        File fileCheck = new File(System.getProperty("user.dir") + "/Peer_" + peerProcess.getPeerId() + "/" + fileName);
+        if (!fileCheck.exists()) {
             try {
                 for (int i = 0; i < numPieces; i++) {
                     byte[] temp = new byte[piecesList.get(i).getPieceSize()];
