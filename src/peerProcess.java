@@ -81,11 +81,21 @@ class peerProcess {
         }
 
         while (!allPeersHaveFile) {
-            // System.out.println("start");
+             System.out.println("start");
             if (peerDictionary.get(peerId).getHasFile()) {
                 first = true;
             }
+            /*
+            System.out.print("Choked: ");
+            for (Integer integer : choked) {
+                System.out.print(integer + ", ");
+            }
 
+            System.out.print("\nUnhoked: ");
+            for (Integer integer : unchoked) {
+                System.out.print(integer + ", ");
+            }
+            */
             ArrayList<Integer> interested = new ArrayList<>();
 
             for (ConcurrentHashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
@@ -93,16 +103,26 @@ class peerProcess {
                     interested.add(entry.getKey());
                 }
             }
-
+            /*
+            System.out.print("\nInterested: ");
+            for (Integer integer : interested) {
+                System.out.print(integer + ", ");
+            }
+            System.out.println("");
+            */
             long currentTime = System.currentTimeMillis();
             int iter = 0;
             if (currentTime - previousUnchoke > unchokingInterval && connectionManager.size() != 0
                     && interested.size() != 0) {
                 if (first) {
+                    preferredNeighbors.clear();
                     Object[] peers = connectionManager.keySet().toArray();
+                    choked.clear();
                     for (Object object : peers) {
                         // Start all peers as choked
-                        choked.add((Integer) object);
+                        if (!peerDictionary.get((Integer)object).getHasFile()) {
+                            choked.add((Integer) object);
+                        }
                     }
                     for (int i = 0; i < Math.min(numberOfPreferredNeighbors, interested.size()); i++) {
                         int choice = 0;
@@ -113,12 +133,20 @@ class peerProcess {
                             // System.out.println(Integer.toString(ind));
                             // choice = (Integer) peers[random.nextInt(peers.length)];
 
-                        } while (choice == peerId && !preferredNeighbors.contains(choice));
+                        } while (choice == peerId || preferredNeighbors.contains(choice));
                         // System.out.println("choice: " + choice);
                         preferredNeighbors.add(i, choice);
                         iter++;
                     }
                     System.out.println(preferredNeighbors.size());
+
+                    String preferred = "Peer " + peerId + " has the preferred neighbors ";
+                    for (Integer integer : preferredNeighbors) {
+                        preferred += integer + ", ";
+                    }
+
+                    Logger.write(preferred.substring(0, preferred.length() - 2) + ".");
+
                     for (int i = 0; i < Math.min(numberOfPreferredNeighbors, interested.size()); i++) {
                         connectionManager.get(preferredNeighbors.get(i)).sendUnchoke();
                         unchoked.add(preferredNeighbors.get(i));
@@ -133,6 +161,7 @@ class peerProcess {
                     }
                     first = false;
                 } else {
+                    System.out.println("WITHIN ELSE STATEMENT!!");
                     ArrayList<Integer> sorted = new ArrayList<>();
                     for (ConcurrentHashMap.Entry<Integer, PeerConnection> entry : connectionManager.entrySet()) {
                         downloadRate.put(entry.getKey(), entry.getValue().piecesReceived());
@@ -159,9 +188,9 @@ class peerProcess {
                         }
                     }
 
-                    String preferred = "";
+                    String preferred = "Peer " + peerId + " has the preferred neighbors ";
                     int modifier = 0;
-                    for (int i = 0; i < sorted.size(); i++) {
+                    for (int i = 0; i < Math.min(numberOfPreferredNeighbors, sorted.size()); i++) {
                         if (i < numberOfPreferredNeighbors + modifier) {
                             if (!interested.contains(sorted.get(i))) {
                                 modifier++;
@@ -173,7 +202,7 @@ class peerProcess {
                         }
                     }
 
-                    connectionManager.get(peerId).updatePreferred(preferred.substring(0, preferred.length() - 2));
+                    Logger.write(preferred.substring(0, preferred.length() - 2) + ".");
 
                     modifier = 0;
                     int iterator = 0;
@@ -228,6 +257,7 @@ class peerProcess {
                     break;
                 }
             }
+            if ()
             // System.out.println("end");
         }
         terminateThreads();
@@ -282,7 +312,7 @@ class peerProcess {
         try {
 
             /* Read Common.cfg */
-            commonBufferedReader = new BufferedReader(new FileReader("./Common3.cfg"));
+            commonBufferedReader = new BufferedReader(new FileReader("./Common.cfg"));
 
             // TODO this could probably be a loop that automatically names the variables in
             // a HashMap;\

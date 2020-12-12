@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.net.ServerSocket;
@@ -212,7 +213,9 @@ public class PeerConnection implements Runnable {
         try {
             outputStream.write(unchokeMessage);
             outputStream.flush();
-        } catch (IOException e) {
+        } catch (SocketException e) {
+            //is fine
+        }catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -312,7 +315,9 @@ public class PeerConnection implements Runnable {
         try {
             outputStream.write(haveMessage);
             outputStream.flush();
-        } catch (IOException e) {
+        } catch (SocketException e) {
+            // do nothing, this is normal   
+        }catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -405,7 +410,8 @@ public class PeerConnection implements Runnable {
 
     public void sendPiece(byte[] pieceIndex) {
         byte[] filePiece = peerProcess.getFileManager().fileToPieces(ByteBuffer.wrap(pieceIndex).getInt());
-        byte[] pieceMessage = new byte[4 + 1 + 4 + filePiece.length];
+        int val = filePiece.length;
+        byte[] pieceMessage = new byte[4 + 1 + 4 + val];
 
         ByteBuffer lengthBuf = ByteBuffer.allocate(4);
         lengthBuf.putInt(4 + filePiece.length);
@@ -452,10 +458,6 @@ public class PeerConnection implements Runnable {
         return isInterested;
     }
 
-    public void updatePreferred(String preferred) {
-        Logger.write("Peer " + peerProcess.getPeerId() + " has the preferred neighbors " + preferred + ".");
-    }
-
     public synchronized void processMessage() { // TODO confirm what "synchronized does"
 
         byte[] messageLength = new byte[4];
@@ -475,18 +477,24 @@ public class PeerConnection implements Runnable {
 
         switch (type) {
             case 0: // choke
-                Logger.write("Peer " + peerProcess.getPeerId() + " is choked by " + connectedPeerId + ".");
+                if (!isChoked) {
+                    isChoked = true;
+                    Logger.write("Peer " + peerProcess.getPeerId() + " is choked by " + connectedPeerId + ".");
+                }
                 break;
             case 1: // unchoke
-                piecesReceived = 0;
-                Logger.write("Peer " + peerProcess.getPeerId() + " is unchoked by " + connectedPeerId + ".");
-                if (!peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile()) {
-                    System.out.println("Got unchoked, sending request");
-                    byte[] piece = pickPieceIndex();
-                    if (piece != null) {
-                        sendRequest(piece);
-                    } else {
-                        sendUninterested();
+                if (isChoked) {
+                    isChoked = false;
+                    piecesReceived = 0;
+                    Logger.write("Peer " + peerProcess.getPeerId() + " is unchoked by " + connectedPeerId + ".");
+                    if (!peerProcess.getPeerDictionary().get(peerProcess.getPeerId()).getHasFile()) {
+                        System.out.print("Got unchoked, sending request for piece ");
+                        byte[] piece = pickPieceIndex();
+                        if (piece != null) {
+                            sendRequest(piece);
+                        } else {
+                            sendUninterested();
+                        }
                     }
                 }
                 break;
@@ -594,8 +602,8 @@ public class PeerConnection implements Runnable {
                 break;
             default:
                 Logger.write("MESSAGE TYPE ERROR");
-                System.err.println("Message type error!");
-                System.out.println("REC TYPE: " + type);
+                System.err.println("Message type error! from " + connectedPeerId);
+                System.out.println("REC TYPE: " + type + ", " + length);
 
         }
 
